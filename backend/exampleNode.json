@@ -1,0 +1,63 @@
+{
+  "Slack": {
+    "name": "Slack Alert",
+    "type": "SLACK",
+    "config": {
+      "channel": "#general",
+      "message": "Workflow Completed!",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Workflow Completed Successfully!*"
+          }
+        },
+        { "type": "divider" },
+        {
+          "type": "section",
+          "text": { "type": "mrkdwn", "text": "Triggered from engine." }
+        }
+      ]
+    },
+    "position": 5
+  },
+  "Test-Thread-Reply": {
+    "name": "Slack Thread Node",
+    "type": "SLACK",
+    "config": {
+      "channel": "#general",
+      "threadTs": "1723011221.1234",
+      "message": "Replying in thread!"
+    },
+    "position": 6
+  },
+  "Sheet-Append": {
+    "name": "Append Row",
+    "type": "SHEETS",
+    "config": {
+      "sheetId": "1AbcdEFghiJKLmnopQrStUvWxYz1234567890",
+      "range": "Sheet1!A1",
+      "mode": "append",
+      "row": { "name": "Vipul", "age": 30 }
+    },
+    "position": 5
+  },
+  "Read-range": {
+    "name": "Read Rows",
+    "type": "SHEETS",
+    "config": {
+      "sheetId": "1AbcdEFghiJKLmnopQrStUvWxYz1234567890",
+      "range": "Sheet1!A1:C10",
+      "mode": "read"
+    },
+    "position": 6
+  },
+  "fallback-sheety": {
+    "type": "SHEETS",
+    "config": {
+      "fallbackUrl": "https://api.sheety.co/demo/sheet1",
+      "row": { "log": "Fallback worked" }
+    }
+  }
+}

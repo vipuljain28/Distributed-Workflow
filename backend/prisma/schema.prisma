@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String
+  role      Role        @default(CREATOR)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  // for OAuth tokens we can store optional fields later
+  workflows Workflow[]
+}
+
+model Workflow {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  ownerId      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  nodes        Node[]
+  owner        User          @relation(fields: [ownerId], references: [id])
+  workflowRuns WorkflowRun[]
+  edges Edge[]
+  conditions Condition[]
+}
+
+model Node {
+  id         String    @id @default(cuid())
+  workflowId String
+  name       String
+  type       NodeType @default(START) 
+  config     Json?
+  position   Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  workflow   Workflow  @relation(fields: [workflowId], references: [id])
+  outgoingEdges Edge[] @relation("edge_from")
+  incomingEdges Edge[] @relation("edge_to")
+  runs       NodeRun[]
+}
+
+model Condition {
+  id         String        @id @default(uuid())
+  workflowId String
+  name       String
+  type       ConditionType @default(EXPRESSION)
+  // params: expression, key/value, etc.
+  params     Json?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  workflow Workflow @relation(fields: [workflowId], references: [id])
+  edges    Edge[] @relation("condition_edges")
+}
+
+model Edge {
+  id          String   @id @default(uuid())
+  workflowId  String
+  fromNodeId  String
+  toNodeId    String
+  conditionId String?  // nullable: edge may be unconditional
+  createdAt   DateTime @default(now())
+
+  workflow  Workflow  @relation(fields: [workflowId], references: [id])
+  fromNode  Node      @relation("edge_from", fields: [fromNodeId], references: [id])
+  toNode    Node      @relation("edge_to", fields: [toNodeId], references: [id])
+  condition Condition? @relation("condition_edges", fields: [conditionId], references: [id])
+}
+
+model WorkflowRun {
+  id         String    @id @default(cuid())
+  workflowId String
+  status     WorkflowRunStatus // 'pending', 'running', 'succeeded', 'failed', 'cancelled'
+  input      Json?
+  output     Json?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  workflow   Workflow  @relation(fields: [workflowId], references: [id])
+  nodeRuns   NodeRun[]
+}
+
+model NodeRun {
+  id            String    @id @default(cuid())
+  nodeId        String
+  workflowRunId String
+  status        NodeRunStatus // pending/running/success/failed
+  attempt       Int       @default(0)
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  input         Json?
+  output        Json?
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  node        Node        @relation(fields: [nodeId], references: [id])
+  workflowRun WorkflowRun @relation(fields: [workflowRunId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  level     String
+  message   String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  CREATOR
+  VIEWER
+}
+enum NodeType {
+  START
+  ACTION     
+  HTTP
+  CONDITION
+  DELAY
+  SLACK
+  SHEETS
+  EMAIL
+  END
+}
+enum ConditionType {
+  EXPRESSION
+  EQUALS
+  EXISTS
+  CUSTOM
+}
+enum WorkflowRunStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+enum NodeRunStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}
