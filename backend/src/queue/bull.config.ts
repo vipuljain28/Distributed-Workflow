@@ -3,7 +3,7 @@ import { Queue, Worker, QueueEvents  } from "bullmq";
 import IORedis from "ioredis";
 import config from "../config";
 
-const connection = new IORedis(config.redisUrl,{
+export const connection = new IORedis(config.redisUrl,{
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
 });

@@ -6,6 +6,10 @@ import { SlackNode } from "./nodes/slack.node";
 import { SheetsNode } from "./nodes/sheets.node";
 import { ConditionNode } from "./nodes/condition.node";
 import { EmailNode } from "./nodes/email.node";
+import { ReelRenderNode } from "./nodes/reel-render.node";
+import { ImageSeriesNode } from "./nodes/image-series.node";
+import { ApprovalGateNode } from "./nodes/approval-gate.node";
+import { SocialPublishNode } from "./nodes/social-publish.node";
 
 type ExecutorCtor = new (config: any) => { execute: (input: any) => Promise<any> };
 
@@ -20,6 +24,10 @@ class NodeRegistry {
     CONDITION: ConditionNode,
     EMAIL: EmailNode,
     END: ActionNode,
+    REEL_RENDER: ReelRenderNode,
+    IMAGE_SERIES: ImageSeriesNode,
+    APPROVAL_GATE: ApprovalGateNode,
+    SOCIAL_PUBLISH: SocialPublishNode,
   };
 
   getExecutor(type: string | null | undefined): ExecutorCtor | undefined {

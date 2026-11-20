@@ -131,6 +131,10 @@ enum NodeType {
   SHEETS
   EMAIL
   END
+  REEL_RENDER
+  IMAGE_SERIES
+  APPROVAL_GATE
+  SOCIAL_PUBLISH
 }
 enum ConditionType {
   EXPRESSION
@@ -141,6 +145,7 @@ enum ConditionType {
 enum WorkflowRunStatus {
   PENDING
   RUNNING
+  WAITING_APPROVAL
   SUCCEEDED
   FAILED
   CANCELLED

@@ -13,6 +13,8 @@ import structureRoutes from "./routes/structure.routes";
 import runRoutes from "./routes/run.routes";
 import scheduleRoutes from "./routes/schedule.routes";
 import runStatusRoutes from "./routes/runStatus.routes";
+import approvalRoutes from "./routes/approval.routes";
+import path from "path";
 
 dotenv.config();
 
@@ -21,16 +23,18 @@ app.use(express.json());
 
 app.use(cors(
   {
-    origin: "http://localhost:5173",
-    Credential: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTOIN"],
-    allowedHeaders: ['Content-type', "Authorization"]
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ['Content-Type', "Authorization"]
   }
 ));
 app.use("/health", healthRoute);
+app.use("/media", express.static(path.join(process.cwd(), "temp_renders")));
 
 app.use("/auth", authRoutes);
 app.use("/workflow", workflowRoutes);
+app.use("/approvals", approvalRoutes);
 
 // Mount nested routes that need workflowId param
 // nodes: POST /workflow/:workflowId/nodes
@@ -49,6 +53,19 @@ app.use("/workflow/:workflowId", structureRoutes);
 app.use("/workflow/:workflowId/run", runRoutes);
 app.use("/workflow/:workflowId/schedule", scheduleRoutes);
 app.use("/workflowRun", runStatusRoutes);
+
+// Static frontend serving if built
+const frontendDist = path.join(process.cwd(), "../frontend/dist");
+app.use(express.static(frontendDist));
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/workflow") || req.path.startsWith("/auth") || req.path.startsWith("/approvals") || req.path.startsWith("/health")) {
+    return next();
+  }
+  const indexPath = path.join(frontendDist, "index.html");
+  res.sendFile(indexPath, (err) => {
+    if (err) next();
+  });
+});
 
 const port = process.env.PORT || 4000;
 app.listen(port, async () => {

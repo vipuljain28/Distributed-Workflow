@@ -7,6 +7,13 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
   const token = header.split(" ")[1];
 
+  // Direct Master Admin Password check
+  const masterPassword = process.env.ADMIN_PASSWORD;
+  if (masterPassword && token === masterPassword) {
+    (req as any).user = { id: "admin-master", email: "admin@workflow.local", role: "ADMIN" };
+    return next();
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_SECRET!);
     (req as any).user = decoded;

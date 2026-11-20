@@ -3,17 +3,11 @@ import { WorkflowRunStatus, PrismaClient } from "@prisma/client";
 import { logger } from "./lib/logger";
 import dotenv from "dotenv";
 import { Worker } from "bullmq";
-import { workflowQueue, nodeQueue } from "./queue/bull.config";
+import { workflowQueue, nodeQueue, connection } from "./queue/bull.config";
 
 dotenv.config();
 
 const prisma = new PrismaClient();
-
-// Use the SAME redis connection + prefix as bull.config.ts
-const connection = {
-  host: "localhost",
-  port: 6379,
-};
 
 const prefix = process.env.BULL_PREFIX || "flow";
 
@@ -146,5 +140,17 @@ workflowWorker.on("failed", (job, err) => {
 });
 
 // Start node worker
-logger.info("Starting Node Worker...");
+logger.info("🚀 Starting Node Execution Worker...");
+import { createWorker } from "./queue/bull.config";
+import { engine } from "./execution/engine";
+
+const nodeWorker = createWorker(async (job) => {
+  const nodeRunId: string = job.data?.nodeRunId;
+  if (!nodeRunId) throw new Error("Missing nodeRunId");
+  logger.info({ nodeRunId }, "node-worker processing");
+  await engine.executeNodeRun(nodeRunId);
+});
+
+nodeWorker.on("completed", (job) => logger.info({ jobId: job.id }, "✅ Node job completed"));
+nodeWorker.on("failed", (job, err) => logger.error({ jobId: job?.id, err }, "❌ Node job failed"));
 

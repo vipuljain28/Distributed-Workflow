@@ -79,6 +79,22 @@ export class Engine {
 
     // compute next edges from this node
     const outgoingEdges = workflow.edges.filter(e => e.fromNodeId === node.id);
+
+    // If node is an APPROVAL_GATE, pause DAG execution until human approves
+    if (node.type === "APPROVAL_GATE") {
+      await prisma.workflowRun.update({
+        where: { id: workflowRun.id },
+        data: {
+          status: WorkflowRunStatus.WAITING_APPROVAL,
+          output: result.output !== undefined
+            ? JSON.parse(JSON.stringify(result.output))
+            : null,
+        }
+      });
+      logger.info({ workflowRunId: workflowRun.id, nodeRunId }, "Workflow paused at APPROVAL_GATE. Awaiting human intervention.");
+      return;
+    }
+
     if (!outgoingEdges || outgoingEdges.length === 0) {
       // If node type is END or no outgoing edges, finish workflow
       if (node.type === "END") {

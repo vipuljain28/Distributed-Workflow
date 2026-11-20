@@ -25,6 +25,30 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
+  // Single Master Admin Password Check
+  const masterPassword = process.env.ADMIN_PASSWORD;
+  if (masterPassword && password === masterPassword) {
+    let adminUser = await prisma.user.findFirst({ where: { role: "ADMIN" } });
+    if (!adminUser) {
+      const hashed = await hashPassword(masterPassword);
+      adminUser = await prisma.user.create({
+        data: {
+          email: email || "admin@workflow.local",
+          name: "Master Admin",
+          password: hashed,
+          role: "ADMIN"
+        }
+      });
+    }
+
+    const tokens = generateTokens({ id: adminUser.id, role: "ADMIN" });
+    return res.json({
+      message: "Logged in via Master Admin Password",
+      user: { id: adminUser.id, email: adminUser.email, role: "ADMIN" },
+      ...tokens
+    });
+  }
+
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(404).json({ message: "Not found" });
 
