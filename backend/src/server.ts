@@ -33,6 +33,21 @@ app.use(cors(
 app.use("/health", healthRoute);
 app.use("/media", express.static(path.join(process.cwd(), "temp_renders")));
 
+// Static frontend assets (JS, CSS, SVGs)
+const frontendDist = path.join(process.cwd(), "../frontend/dist");
+app.use(express.static(frontendDist));
+
+// Serve React SPA index.html for all browser HTML page visits
+app.use((req, res, next) => {
+  if (req.method === "GET" && req.headers.accept?.includes("text/html")) {
+    const indexPath = path.join(frontendDist, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+
 app.use("/auth", authRoutes);
 app.use("/workflow", workflowRoutes);
 app.use("/approvals", approvalRoutes);
@@ -55,39 +70,8 @@ app.use("/workflow/:workflowId/run", runRoutes);
 app.use("/workflow/:workflowId/schedule", scheduleRoutes);
 app.use("/workflowRun", runStatusRoutes);
 
-// Static frontend serving if built
-const frontendDist = path.join(process.cwd(), "../frontend/dist");
-app.use(express.static(frontendDist));
-
-// SPA routing for browser navigations (/workflows, /signup, etc.)
-app.use((req, res, next) => {
-  if (req.method !== "GET") return next();
-
-  const isHtmlRequest = req.headers.accept?.includes("text/html");
-  const isFrontendRoute =
-    req.path === "/" ||
-    req.path === "/signup" ||
-    req.path === "/workflows" ||
-    (req.path.startsWith("/workflow/") && isHtmlRequest);
-
-  if (isFrontendRoute || (isHtmlRequest && !req.path.startsWith("/health") && !req.path.startsWith("/media"))) {
-    const indexPath = path.join(frontendDist, "index.html");
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-
-  next();
-});
-
-// Catch-all fallback for any unhandled GET route
-app.use((req, res, next) => {
-  if (req.method === "GET") {
-    const indexPath = path.join(frontendDist, "index.html");
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
+// Catch-all 404 handler for API routes
+app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
