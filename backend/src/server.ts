@@ -79,8 +79,8 @@ app.listen(port, async () => {
       logger.info("Initializing background execution workers...");
       import("./worker");
     }
-  } catch (err) {
-    logger.error("DB connection failed", err);
+  } catch (err: any) {
+    logger.error(err, "DB connection failed");
   }
 });
 export default app;

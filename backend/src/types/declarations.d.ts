@@ -12,3 +12,8 @@ declare module "jsonwebtoken" {
   const jwt: any;
   export default jwt;
 }
+
+declare module "cors" {
+  const cors: any;
+  export default cors;
+}
