@@ -73,6 +73,12 @@ app.listen(port, async () => {
   try {
     await prisma.$connect();
     logger.info("Connected to DB");
+
+    // Start in-process BullMQ worker if enabled (ensures 100% free tier compatibility on Render)
+    if (process.env.RUN_WORKER !== "false") {
+      logger.info("Initializing background execution workers...");
+      import("./worker");
+    }
   } catch (err) {
     logger.error("DB connection failed", err);
   }
