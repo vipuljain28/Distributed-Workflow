@@ -6,13 +6,16 @@ export default function Login() {
     const [password, setPassword] = useState("");
 
     const login = async () => {
-        const res = await api.post("/auth/login", { email, password });
-        // console.log(res);
-        if (res.data.message == "Logged in") {
-            localStorage.setItem("token", res.data.accessToken);
-            window.location.href = "/workflows";
-        } else {
-            alert(res.data.message);
+        try {
+            const res = await api.post("/auth/login", { email, password });
+            if (res.data.accessToken || res.data.message === "Logged in") {
+                localStorage.setItem("token", res.data.accessToken);
+                window.location.href = "/workflows";
+            } else {
+                alert(res.data.message || "Login failed");
+            }
+        } catch (err: any) {
+            alert(err.response?.data?.message || err.message || "Login failed");
         }
     };
 

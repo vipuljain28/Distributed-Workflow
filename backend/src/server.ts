@@ -15,6 +15,7 @@ import scheduleRoutes from "./routes/schedule.routes";
 import runStatusRoutes from "./routes/runStatus.routes";
 import approvalRoutes from "./routes/approval.routes";
 import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -57,14 +58,24 @@ app.use("/workflowRun", runStatusRoutes);
 // Static frontend serving if built
 const frontendDist = path.join(process.cwd(), "../frontend/dist");
 app.use(express.static(frontendDist));
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/workflow") || req.path.startsWith("/auth") || req.path.startsWith("/approvals") || req.path.startsWith("/health")) {
+
+// SPA Fallback without bare wildcard (Express 5 safe)
+app.use((req, res, next) => {
+  if (req.method !== "GET") return next();
+  if (
+    req.path.startsWith("/workflow") ||
+    req.path.startsWith("/auth") ||
+    req.path.startsWith("/approvals") ||
+    req.path.startsWith("/health") ||
+    req.path.startsWith("/media")
+  ) {
     return next();
   }
   const indexPath = path.join(frontendDist, "index.html");
-  res.sendFile(indexPath, (err) => {
-    if (err) next();
-  });
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  next();
 });
 
 const port = process.env.PORT || 4000;

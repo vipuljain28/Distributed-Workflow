@@ -43,7 +43,7 @@ export const login = async (req: Request, res: Response) => {
 
     const tokens = generateTokens({ id: adminUser.id, role: "ADMIN" });
     return res.json({
-      message: "Logged in via Master Admin Password",
+      message: "Logged in",
       user: { id: adminUser.id, email: adminUser.email, role: "ADMIN" },
       ...tokens
     });
