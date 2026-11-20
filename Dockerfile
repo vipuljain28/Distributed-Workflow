@@ -1,5 +1,5 @@
-# Multi-stage Dockerfile for Distributed Workflow with FFmpeg
-FROM node:20-bullseye-slim AS builder
+# Multi-stage Dockerfile for Distributed Workflow with FFmpeg (Debian Bookworm)
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY backend/ ./backend/
 RUN cd backend && npx prisma generate && npm run build
 
 # --- Production Runner ---
-FROM node:20-bullseye-slim AS runner
+FROM node:20-bookworm-slim AS runner
 
 WORKDIR /app
 
