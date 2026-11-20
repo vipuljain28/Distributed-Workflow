@@ -59,23 +59,36 @@ app.use("/workflowRun", runStatusRoutes);
 const frontendDist = path.join(process.cwd(), "../frontend/dist");
 app.use(express.static(frontendDist));
 
-// SPA Fallback without bare wildcard (Express 5 safe)
+// SPA routing for browser navigations (/workflows, /signup, etc.)
 app.use((req, res, next) => {
   if (req.method !== "GET") return next();
-  if (
-    req.path.startsWith("/workflow") ||
-    req.path.startsWith("/auth") ||
-    req.path.startsWith("/approvals") ||
-    req.path.startsWith("/health") ||
-    req.path.startsWith("/media")
-  ) {
-    return next();
+
+  const isHtmlRequest = req.headers.accept?.includes("text/html");
+  const isFrontendRoute =
+    req.path === "/" ||
+    req.path === "/signup" ||
+    req.path === "/workflows" ||
+    (req.path.startsWith("/workflow/") && isHtmlRequest);
+
+  if (isFrontendRoute || (isHtmlRequest && !req.path.startsWith("/health") && !req.path.startsWith("/media"))) {
+    const indexPath = path.join(frontendDist, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
   }
-  const indexPath = path.join(frontendDist, "index.html");
-  if (fs.existsSync(indexPath)) {
-    return res.sendFile(indexPath);
-  }
+
   next();
+});
+
+// Catch-all fallback for any unhandled GET route
+app.use((req, res, next) => {
+  if (req.method === "GET") {
+    const indexPath = path.join(frontendDist, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  res.status(404).json({ message: "Not found" });
 });
 
 const port = process.env.PORT || 4000;
