@@ -14,6 +14,7 @@ import runRoutes from "./routes/run.routes";
 import scheduleRoutes from "./routes/schedule.routes";
 import runStatusRoutes from "./routes/runStatus.routes";
 import approvalRoutes from "./routes/approval.routes";
+import templateRoutes from "./routes/template.routes";
 import path from "path";
 import fs from "fs";
 
@@ -51,6 +52,8 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/workflow", workflowRoutes);
 app.use("/approvals", approvalRoutes);
+app.use("/templates", templateRoutes);
+app.use("/workflow-templates", templateRoutes);
 
 // Mount nested routes that need workflowId param
 // nodes: POST /workflow/:workflowId/nodes

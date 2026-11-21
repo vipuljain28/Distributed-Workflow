@@ -135,6 +135,7 @@ enum NodeType {
   IMAGE_SERIES
   APPROVAL_GATE
   SOCIAL_PUBLISH
+  WEBHOOK_DISPATCH
 }
 enum ConditionType {
   EXPRESSION

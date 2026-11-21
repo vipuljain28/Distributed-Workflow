@@ -10,6 +10,7 @@ import { ReelRenderNode } from "./nodes/reel-render.node";
 import { ImageSeriesNode } from "./nodes/image-series.node";
 import { ApprovalGateNode } from "./nodes/approval-gate.node";
 import { SocialPublishNode } from "./nodes/social-publish.node";
+import { WebhookDispatchNode } from "./nodes/webhook-dispatch.node";
 
 type ExecutorCtor = new (config: any) => { execute: (input: any) => Promise<any> };
 
@@ -28,6 +29,7 @@ class NodeRegistry {
     IMAGE_SERIES: ImageSeriesNode,
     APPROVAL_GATE: ApprovalGateNode,
     SOCIAL_PUBLISH: SocialPublishNode,
+    WEBHOOK_DISPATCH: WebhookDispatchNode,
   };
 
   getExecutor(type: string | null | undefined): ExecutorCtor | undefined {

@@ -22,5 +22,13 @@ export const WorkflowAPI = {
     runStatus: (id: string) =>
         api.get(`/workflowRun/${id}`),
 
+    // Templates
+    listTemplates: () => api.get("/templates"),
+    instantiateTemplate: (templateId: string, name?: string) =>
+        api.post(`/templates/${templateId}/instantiate`, { name }),
 
+    // Approvals
+    listPendingApprovals: () => api.get("/approvals/pending"),
+    approveRun: (runId: string, data?: any) => api.post(`/approvals/${runId}/approve`, data),
+    rejectRun: (runId: string, reason?: string) => api.post(`/approvals/${runId}/reject`, { reason }),
 };

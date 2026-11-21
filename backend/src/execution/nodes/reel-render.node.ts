@@ -8,10 +8,14 @@ import path from "path";
 
 const execAsync = promisify(exec);
 
-interface ReelRenderConfig {
+export interface ReelRenderConfig {
   aspectRatio?: string; // default "9:16"
   targetDurationSec?: number; // default 30
-  template?: string; // "minimal" | "dynamic" | "educational"
+  template?: "4-beat" | "minimal" | "dynamic" | "educational" | "custom";
+  geminiApiKey?: string;
+  openaiApiKey?: string;
+  customPrompt?: string;
+  voiceoverTone?: string;
 }
 
 export class ReelRenderNode {
@@ -19,38 +23,100 @@ export class ReelRenderNode {
 
   constructor(config: any) {
     this.config = {
-      aspectRatio: config.aspectRatio || "9:16",
-      targetDurationSec: config.targetDurationSec || 30,
-      template: config.template || "educational",
+      aspectRatio: config?.aspectRatio || "9:16",
+      targetDurationSec: config?.targetDurationSec || 30,
+      template: config?.template || "4-beat",
+      geminiApiKey: config?.geminiApiKey,
+      openaiApiKey: config?.openaiApiKey,
+      customPrompt: config?.customPrompt,
+      voiceoverTone: config?.voiceoverTone || "energetic",
     };
   }
 
   async execute(input: NodeExecutionInput): Promise<NodeExecutionResult> {
     try {
-      const concept = input.concept || input.topic || "Understanding Cloud Architecture";
-      const apiKey = process.env.GEMINI_API_KEY;
+      // BYOK Resolution: Dynamic input -> Node Config -> Environment variable
+      const concept = input.prompt || input.concept || input.topic || this.config.customPrompt || "Scalable Microservices Architecture";
+      const apiKey = input.geminiApiKey || this.config.geminiApiKey || process.env.GEMINI_API_KEY;
+      const template = this.config.template || "4-beat";
 
-      let storyboard: any = {
-        title: concept,
-        scenes: [
-          { time: "0-5s", hook: `Did you know how ${concept} works?`, visual: "Title hook with dynamic motion" },
-          { time: "5-15s", explanation: `At its core, ${concept} decouples complexity.`, visual: "Architecture diagram" },
-          { time: "15-25s", example: "Here is a real world breakdown of the flow.", visual: "Step by step animation" },
-          { time: "25-30s", cta: "Follow for more engineering architecture breakdowns!", visual: "CTA card" }
-        ],
-        narration: `Did you know how ${concept} works? At its core, it decouples complexity and ensures high scale. Here is a real world breakdown. Follow for more!`,
-      };
+      let storyboard: any;
 
-      // 1. Directing with Gemini if key is provided
+      if (template === "4-beat") {
+        // High-retention 4-beat structure (Viral Reel Studio style: Hook -> Reality -> Showdown -> Outro)
+        storyboard = {
+          title: concept,
+          template: "Viral Reel Studio (4-Beat)",
+          beats: [
+            {
+              beat: 1,
+              name: "HOOK",
+              timing: "0:00 - 0:03",
+              hookText: `Stop building ${concept} the wrong way!`,
+              visualPrompt: "High-contrast dynamic motion with bold kinetic typography",
+              soundEffect: "whoosh_bass_drop",
+            },
+            {
+              beat: 2,
+              name: "REALITY_CHECK",
+              timing: "0:03 - 0:10",
+              hookText: "Most engineers make this one fatal mistake that causes 3 AM cascade crashes.",
+              visualPrompt: "Architecture diagram showing single point of failure glitching in red",
+              soundEffect: "glitch_alert",
+            },
+            {
+              beat: 3,
+              name: "THE_BREAKTHROUGH",
+              timing: "0:10 - 0:24",
+              hookText: "Here is the production-grade decoupled pattern top 1% teams use instead.",
+              visualPrompt: "Clean 3-tier flow with queues, stateless workers, and read-replicas in green",
+              soundEffect: "uplifting_riser",
+            },
+            {
+              beat: 4,
+              name: "OUTRO_CTA",
+              timing: "0:24 - 0:30",
+              hookText: "Save this blueprint for your next system design interview or refactor!",
+              visualPrompt: "Animated CTA bookmark card with creator branding",
+              soundEffect: "chime_bell",
+            },
+          ],
+          narration: `Stop building ${concept} the wrong way! Most engineers make this one fatal mistake that causes cascade crashes under load. Here is the decoupled pattern top teams use instead: queue the workload, keep services stateless, and replicate your data layer. Save this blueprint for your next refactor!`,
+          voiceover: {
+            tone: this.config.voiceoverTone,
+            targetWpm: 160,
+          },
+        };
+      } else {
+        storyboard = {
+          title: concept,
+          template: "Educational Breakdown",
+          beats: [
+            { beat: 1, name: "INTRO", timing: "0:00 - 0:05", hookText: `Understanding ${concept} in 30 Seconds` },
+            { beat: 2, name: "MECHANISM", timing: "0:05 - 0:15", hookText: "How the core engine orchestrates operations." },
+            { beat: 3, name: "PRODUCTION_CASE", timing: "0:15 - 0:25", hookText: "Real-world throughput benchmarks." },
+            { beat: 4, name: "SUMMARY", timing: "0:25 - 0:30", hookText: "Key takeaways to remember." },
+          ],
+          narration: `Here is ${concept} explained in 30 seconds. Learn how it orchestrates operations with high efficiency. Follow for more!`,
+        };
+      }
+
+      // If user provided Gemini API Key, generate custom AI storyboard
       if (apiKey) {
         try {
-          const prompt = `You are an AI Video Director. Create a high-retention 9:16 vertical video script for: "${concept}".
-Output valid JSON with keys: title, durationSec, scenes (array of { time, text, visualPrompt }), narration.`;
+          const aiPrompt = `You are a Principal Creative Director for viral short-form tech video reels.
+Create a high-retention 4-beat 9:16 vertical video script for: "${concept}".
+Beats must be:
+1. HOOK (0-3s): Punchy controversy or pattern interrupt.
+2. REALITY_CHECK (3-10s): The problem/trap most people fall into.
+3. THE_BREAKTHROUGH (10-24s): The step-by-step solution.
+4. OUTRO_CTA (24-30s): Call to action to save/share.
+Output valid JSON only with keys: title, durationSec, beats (array of { beat, name, timing, hookText, visualPrompt, soundEffect }), narration.`;
 
           const aiRes = await axios.post(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             {
-              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              contents: [{ role: "user", parts: [{ text: aiPrompt }] }],
               generationConfig: { responseMimeType: "application/json" }
             },
             { timeout: 30000 }
@@ -59,11 +125,11 @@ Output valid JSON with keys: title, durationSec, scenes (array of { time, text, 
           const parsed = JSON.parse(aiRes.data.candidates[0].content.parts[0].text);
           storyboard = parsed;
         } catch (e: any) {
-          console.warn("Gemini storyboard fallback to template:", e?.message);
+          console.warn("[ReelRender] Gemini prompt execution fallback to template:", e?.message);
         }
       }
 
-      // 2. FFmpeg Video Rendering (if FFmpeg is available on host)
+      // FFmpeg local synthetic render
       const outputDir = path.join(process.cwd(), "temp_renders");
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -74,16 +140,13 @@ Output valid JSON with keys: title, durationSec, scenes (array of { time, text, 
 
       let renderedWithFFmpeg = false;
       try {
-        // Test FFmpeg existence
         await execAsync("ffmpeg -version");
-
-        // Generate synthetic test clip (1080x1920 9:16 vertical color card with title text)
-        const safeTitle = (storyboard.title || concept).replace(/['"]/g, "");
-        const ffmpegCmd = `ffmpeg -y -f lavfi -i color=c=0x1e1e2e:s=1080x1920:d=10 -vf "drawtext=text='${safeTitle}':fontcolor=white:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2" -c:v libx264 -pix_fmt yuv420p "${videoPath}"`;
+        const safeTitle = (storyboard.title || concept).replace(/[^a-zA-Z0-9 ]/g, " ");
+        const ffmpegCmd = `ffmpeg -y -f lavfi -i color=c=0x0f172a:s=1080x1920:d=10 -vf "drawtext=text='${safeTitle}':fontcolor=white:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2" -c:v libx264 -pix_fmt yuv420p "${videoPath}"`;
         await execAsync(ffmpegCmd);
         renderedWithFFmpeg = true;
       } catch (ffErr) {
-        console.info("FFmpeg direct render not executed (falling back to RenderPlan metadata):", (ffErr as any)?.message);
+        // Fallback for environments where ffmpeg CLI isn't installed
       }
 
       return {
@@ -92,8 +155,11 @@ Output valid JSON with keys: title, durationSec, scenes (array of { time, text, 
           concept,
           mediaType: "VIDEO_REEL",
           aspectRatio: this.config.aspectRatio,
+          targetDurationSec: this.config.targetDurationSec,
           videoPath: renderedWithFFmpeg ? videoPath : null,
-          videoUrl: renderedWithFFmpeg ? `/media/renders/${videoFilename}` : `https://storage.googleapis.com/preview-reels/${videoFilename}`,
+          videoUrl: renderedWithFFmpeg
+            ? `/media/${videoFilename}`
+            : `https://storage.googleapis.com/preview-reels/${videoFilename}`,
           storyboard,
           status: "RENDERED",
         },
@@ -101,7 +167,7 @@ Output valid JSON with keys: title, durationSec, scenes (array of { time, text, 
     } catch (err: any) {
       return {
         success: false,
-        errorMessage: `ReelRenderNode failed: ${err?.message || err}`,
+        error: err.message,
       };
     }
   }
