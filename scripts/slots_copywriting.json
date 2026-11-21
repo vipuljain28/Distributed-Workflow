@@ -1,0 +1,62 @@
+{
+  "slot1": {
+    "type": "REEL",
+    "track": "DSA Chapter 02",
+    "title": "Primitive vs Reference Types (RAM Stack vs Heap Allocation)",
+    "video_url": "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/ch02_kinetic_reel.mp4",
+    "caption": "A single memory leak crashed an entire trading engine, costing $100,000. \ud83d\udca5\n\nWhy? Because the engineer treated Primitive and Reference types as compiler trivia instead of physical silicon layout.\n\nHere is what really happens inside your RAM:\n\n\u26a1 THE STACK (Sequential & Blazing Fast):\n\u2022 Driven directly by CPU Stack Pointer (RSP)\n\u2022 Holds fixed-size primitives (int64, float, bool)\n\u2022 Allocation = 1 CPU clock cycle (~1 ns)\n\u2022 Auto-freed when function scope exits\n\n\ud83d\udc22 THE HEAP (Dynamic & Scattered):\n\u2022 Stores resizable objects, arrays, and maps\n\u2022 Requires OS syscalls (brk/mmap) & allocator locks\n\u2022 Your stack only holds an 8-byte pointer to the heap block\n\u2022 Dereferencing causes Cache Line Misses (100-200x slower!)\n\n\u26a0\ufe0f THE DEREFERENCING TRAP:\nWhen you pass a primitive, you clone the raw bits.\nWhen you pass an object, you ONLY copy the 8-byte address.\nBoth variables now point to the identical heap address. Mutate one, and you corrupt both!\n\nGolden Rule: Keep hot data sequential on the stack. Avoid deep pointer chasing.\n\nStay sharp, keep building! \ud83d\ude80\n\n#dsa #systemdesign #codinginterview #softwareengineer #computerscience #programming #datastructures #algorithms #webdevelopment #techtrends #cleancode #backend #javascript #python #vipuljain2806"
+  },
+  "slot2": {
+    "type": "REEL",
+    "track": "Solution Architecture Premiere",
+    "title": "The Microservices Fallacy: Why Modular Monoliths Win",
+    "video_url": "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/arch01_kinetic_reel.mp4",
+    "caption": "Why do 90% of Microservices migrations FAIL? \ud83d\udca5\n\nYour startup does not need 50 microservices for 10,000 users.\n\nIn universities and hype blogs, microservices are sold as the pinnacle of architecture.\n\nIn production, premature microservices create a distributed monolith:\n\nIn a monolith, calling another module is an in-memory pointer jump taking 5 nanoseconds.\n\nIn microservices, that same call requires DNS lookup, TLS handshake, JSON serialization, network routing, and deserialization. That is 40 milliseconds: 8,000,000x slower!\n\nSenior architects use the Modular Monolith: strict domain boundaries and in-process event buses with zero network tax.\n\nSave this post for your next system design interview! \ud83d\udcbe\n\nStay sharp, keep building!\n\n#SoftwareEngineering #SystemDesign #Microservices #SoftwareArchitecture #vipuljain2806"
+  },
+  "slot3": {
+    "type": "CAROUSEL",
+    "track": "DSA Chapter 02 Infographics",
+    "title": "Stack vs Heap Physical Allocation Guide",
+    "image_urls": [
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/Slide_1.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/Slide_2.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/Slide_3.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/Slide_4.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/ch02/Slide_5.png"
+    ],
+    "caption": "Where do your variables physically live in RAM? \ud83d\udcbe\n\nSwipe through the 5-slide hardware guide:\n\n\ud83d\udccc Slide 1: Stack vs Heap Architecture \u2014 1 clock cycle vs fragmented allocation\n\ud83d\udccc Slide 2: Raw Bits on the Stack \u2014 How primitives bypass pointer dereferencing\n\ud83d\udccc Slide 3: The 8-Byte Pointer Trap \u2014 Why objects stall CPU execution\n\ud83d\udccc Slide 4: Shallow Copy vs Deep Clone \u2014 The #1 source of production mutation bugs\n\ud83d\udccc Slide 5: Production Cheat Sheet \u2014 The latency numbers every senior engineer memorizes\n\nSave this carousel for your next technical interview! \ud83d\udcbe\n\nStay sharp, keep building!\n\n#DSA #DataStructures #SoftwareEngineering #SystemDesign #vipuljain2806"
+  },
+  "slot4": {
+    "type": "CAROUSEL",
+    "track": "Solution Architecture Premiere Infographics",
+    "title": "Modular Monolith vs Microservices Blueprint",
+    "image_urls": [
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/Slide_1.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/Slide_2.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/Slide_3.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/Slide_4.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/arch01/Slide_5.png"
+    ],
+    "caption": "The Microservices Fallacy: Why Modular Monoliths Win in Production.\n\nSwipe through the 5-slide senior architectural decision framework:\n\n\ud83d\udccc Slide 1: In-Memory (5ns) vs Network Hops (40ms)\n\ud83d\udccc Slide 2: The Network Tax & Serialization Overhead\n\ud83d\udccc Slide 3: Cascading Failures in Distributed Monoliths\n\ud83d\udccc Slide 4: The Clean Modular Monolith Architecture\n\ud83d\udccc Slide 5: Senior Architect Decision Matrix\n\nSave this blueprint for your next design review! \ud83d\udcbe\n\nStay sharp, keep building!\n\n#SoftwareEngineering #SystemDesign #SoftwareArchitecture #Microservices #vipuljain2806"
+  },
+  "slot5": {
+    "type": "REEL",
+    "track": "System Design Master Series Episode 001",
+    "title": "What Actually Happens When Your Bank Sends an OTP?",
+    "video_url": "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/sd01_kinetic_reel.mp4",
+    "caption": "The site says sent. Your phone says nothing. Server up. Tower up. Here is why banking OTPs fail under the hood:\n\nJunior developers make a direct synchronous HTTP call to an SMS gateway right inside the checkout API. If the telecom carrier lags by 4 seconds, API worker threads starve, requests pile up, and your entire checkout service crashes with a 504 Gateway Timeout.\n\nSenior architects build an event-driven notification pipeline:\n1. API Gateway drops the OTP event into RabbitMQ or Kafka in 2ms.\n2. Background worker consumers batch requests via SMPP protocols to telco towers.\n3. Telecom DLT templates scrub and validate regex variables.\n4. If a carrier drops, events route to a Dead Letter Queue with exponential backoff and automatic failover to WhatsApp OTP.\n\nZero thread locks. Zero cascading timeouts.\n\nSave this cheatsheet for your next System Design interview!\n\nStay sharp, keep building!\n\n#systemdesign #softwarearchitecture #backenddevelopment #vipuljain2806"
+  },
+  "slot6": {
+    "type": "CAROUSEL",
+    "track": "System Design Master Series Episode 001 Infographics",
+    "title": "Bank OTP Notification Pipeline Blueprint",
+    "image_urls": [
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/Slide_1.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/Slide_2.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/Slide_3.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/Slide_4.png",
+      "https://raw.githubusercontent.com/vipuljain28/Distributed-Workflow/development/assets/sd01/Slide_5.png"
+    ],
+    "caption": "What Actually Happens When Your Bank Sends an OTP? \ud83d\udee1\ufe0f\n\nSwipe through the 5-slide end-to-end event-driven architecture:\n\n\ud83d\udccc Slide 1: The Synchronous Gateway Trap (Thread starvation & 504 timeouts)\n\ud83d\udccc Slide 2: Asynchronous Event Buffer (RabbitMQ / Kafka)\n\ud83d\udccc Slide 3: Telecom DLT Registry Scrubbing & SMPP Ingestion\n\ud83d\udccc Slide 4: Dead Letter Queue (DLQ) & WhatsApp Fallback Routing\n\ud83d\udccc Slide 5: Senior Architect Production Checklist & SLA Metrics\n\nSave this system architecture blueprint for your next technical round!\n\nStay sharp, keep building!\n\n#systemdesign #softwarearchitecture #backenddevelopment #vipuljain2806"
+  }
+}

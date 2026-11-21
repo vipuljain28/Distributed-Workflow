@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: distributed-workflow-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: ADMIN_PASSWORD
+        value: "Admin@123456" # Default master password
+      - key: ACCESS_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: META_ACCESS_TOKEN
+        sync: false
+      - key: IG_USER_ID
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: workflow-postgres
+          property: connectionString
+      - key: REDIS_URL
+        value: redis://red-dbj46c67bikc73ecdi0g:6379
+
+databases:
+  - name: workflow-postgres
+    plan: free
+    region: oregon

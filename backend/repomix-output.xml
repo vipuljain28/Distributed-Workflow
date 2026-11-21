@@ -1,0 +1,2418 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+backend.zip
+demo.sh
+docker-compose.yml
+exampleNode.json
+jest.config.js
+package.json
+prisma.config.ts
+prisma/schema.prisma
+README.md
+sa-key.json
+src/config/index.ts
+src/db/client.ts
+src/execution/base.node.ts
+src/execution/engine.ts
+src/execution/expression-evaluator.ts
+src/execution/node-registry.ts
+src/execution/nodes/action.node.ts
+src/execution/nodes/condition.node.ts
+src/execution/nodes/delay.node.ts
+src/execution/nodes/email.node.ts
+src/execution/nodes/http.node.ts
+src/execution/nodes/sheets.node.ts
+src/execution/nodes/slack.node.ts
+src/execution/types.ts
+src/lib/google.ts
+src/lib/logger.ts
+src/middleware/auth.ts
+src/modules/actions/action-registry.ts
+src/modules/auth/auth.controller.ts
+src/modules/workflow/condition.controller.ts
+src/modules/workflow/edge.controller.ts
+src/modules/workflow/node.controller.ts
+src/modules/workflow/structure.controller.ts
+src/modules/workflow/workflow.controller.ts
+src/modules/workflows/run.service.ts
+src/modules/workflows/schedule.controller.ts
+src/queue/bull.config.ts
+src/queue/nodeQueue.config.ts
+src/routes/auth.routes.ts
+src/routes/condition.routes.ts
+src/routes/edge.routes.ts
+src/routes/health.ts
+src/routes/node.routes.ts
+src/routes/run.routes.ts
+src/routes/schedule.routes.ts
+src/routes/structure.routes.ts
+src/routes/workflow.routes.ts
+src/server.ts
+src/tests/__mocks__/axios.ts
+src/tests/__mocks__/prismaMock.ts
+src/tests/delay.node.test.ts
+src/tests/engine.test.ts
+src/tests/http.node.test.ts
+src/tests/slack.node.test.ts
+src/types/jexl.d.ts
+src/utils/hash.ts
+src/utils/jwt.ts
+src/worker-node.ts
+src/worker.ts
+tools/convert-key.ps1
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="docker-compose.yml">
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: workflowdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+</file>
+
+<file path="exampleNode.json">
+{
+  "Slack": {
+    "name": "Slack Alert",
+    "type": "SLACK",
+    "config": {
+      "channel": "#general",
+      "message": "Workflow Completed!",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Workflow Completed Successfully!*"
+          }
+        },
+        { "type": "divider" },
+        {
+          "type": "section",
+          "text": { "type": "mrkdwn", "text": "Triggered from engine." }
+        }
+      ]
+    },
+    "position": 5
+  },
+  "Test-Thread-Reply": {
+    "name": "Slack Thread Node",
+    "type": "SLACK",
+    "config": {
+      "channel": "#general",
+      "threadTs": "1723011221.1234",
+      "message": "Replying in thread!"
+    },
+    "position": 6
+  },
+  "Sheet-Append": {
+    "name": "Append Row",
+    "type": "SHEETS",
+    "config": {
+      "sheetId": "1AbcdEFghiJKLmnopQrStUvWxYz1234567890",
+      "range": "Sheet1!A1",
+      "mode": "append",
+      "row": { "name": "Vipul", "age": 30 }
+    },
+    "position": 5
+  },
+  "Read-range": {
+    "name": "Read Rows",
+    "type": "SHEETS",
+    "config": {
+      "sheetId": "1AbcdEFghiJKLmnopQrStUvWxYz1234567890",
+      "range": "Sheet1!A1:C10",
+      "mode": "read"
+    },
+    "position": 6
+  },
+  "fallback-sheety": {
+    "type": "SHEETS",
+    "config": {
+      "fallbackUrl": "https://api.sheety.co/demo/sheet1",
+      "row": { "log": "Fallback worked" }
+    }
+  }
+}
+</file>
+
+<file path="jest.config.js">
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  clearMocks: true,
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  testMatch: ['**/src/tests/**/*.test.ts'],
+};
+</file>
+
+<file path="prisma.config.ts">
+import { defineConfig, env } from "prisma/config";
+import "dotenv/config";
+
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
+  },
+  engine: "classic",
+  datasource: {
+    url: env("DATABASE_URL"),
+  },
+});
+</file>
+
+<file path="src/config/index.ts">
+import dotenv from "dotenv";
+dotenv.config();
+
+export default {
+  port: process.env.PORT || 4000,
+  databaseUrl: process.env.DATABASE_URL!,
+  redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+  bullPrefix: process.env.BULL_PREFIX || "flow",
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+};
+</file>
+
+<file path="src/execution/base.node.ts">
+// src/execution/base.node.ts
+export type NodeInput = Record<string, any>;
+export type NodeOutput = Record<string, any>;
+
+export abstract class BaseNode {
+  id: string;
+  type: string;
+  config: any;
+
+  constructor(id: string, type: string, config: any) {
+    this.id = id;
+    this.type = type;
+    this.config = config ?? {};
+  }
+
+  /** execute node with input context, return output object */
+  abstract execute(input: NodeInput): Promise<NodeOutput>;
+}
+</file>
+
+<file path="src/execution/engine.ts">
+// src/execution/engine.ts
+import { prisma } from "../db/client";
+import { nodeRegistry } from "./node-registry";
+import { nodeQueue } from "../queue/bull.config";
+import { WorkflowRunStatus, NodeRunStatus } from "@prisma/client";
+import { evalExpression } from "./expression-evaluator";
+import { NodeExecutionResult, NodeExecutionInput } from "./types";
+import { logger } from "../lib/logger";
+
+export class Engine {
+  // execute a single nodeRun (by id)
+  async executeNodeRun(nodeRunId: string): Promise<void> {
+    logger.info({ nodeRunId }, "Engine.executeNodeRun: start");
+
+    const nodeRun = await prisma.nodeRun.findUnique({
+      where: { id: nodeRunId },
+      include: {
+        node: true,
+        workflowRun: {
+          include: {
+            workflow: {
+              include: { edges: true, conditions: true, nodes: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!nodeRun) throw new Error(`NodeRun ${nodeRunId} not found`);
+
+    const node = nodeRun.node;
+    const workflowRun = nodeRun.workflowRun;
+    const workflow = workflowRun.workflow;
+
+    // mark node running
+    await prisma.nodeRun.update({
+      where: { id: nodeRunId },
+      data: { status: NodeRunStatus.RUNNING, startedAt: new Date() }
+    });
+
+    // resolve executor
+    const ExecutorCtor = nodeRegistry.getExecutor(node.type);
+    if (!ExecutorCtor) {
+      await this.failNode(nodeRunId, `No executor for node type ${node.type}`);
+      return;
+    }
+
+    // create executor and run
+    const executor = new ExecutorCtor(node.config ?? {});
+    let result: NodeExecutionResult;
+    try {
+      const input: NodeExecutionInput =
+        typeof nodeRun.input === "object" && nodeRun.input !== null
+          ? nodeRun.input as Record<string, any>
+          : { value: nodeRun.input };
+      result = await executor.execute(input);
+    } catch (err: any) {
+      await this.failNode(nodeRunId, String(err?.message ?? err));
+      return;
+    }
+
+    if (!result || result.success !== true) {
+      const message = result?.errorMessage ?? "Node execution failed";
+      await this.failNode(nodeRunId, message);
+      return;
+    }
+
+    // success: update nodeRun output + finishedAt
+    await prisma.nodeRun.update({
+      where: { id: nodeRunId },
+      data: {
+        status: NodeRunStatus.SUCCESS,
+        output: result.output !== undefined
+          ? JSON.parse(JSON.stringify(result.output))
+          : null,
+        finishedAt: new Date()
+      }
+    });
+
+    // compute next edges from this node
+    const outgoingEdges = workflow.edges.filter(e => e.fromNodeId === node.id);
+    if (!outgoingEdges || outgoingEdges.length === 0) {
+      // If node type is END or no outgoing edges, finish workflow
+      if (node.type === "END") {
+        await this.finishWorkflowRun(workflowRun.id, result.output ?? {});
+      }
+      return;
+    }
+
+    // For each outgoing edge, evaluate condition if present, and enqueue NodeRun
+    const ctx = { input: nodeRun.input ?? {}, output: result.output ?? {} };
+
+    for (const edge of outgoingEdges) {
+      if (edge.conditionId) {
+        const cond = workflow.conditions.find(c => c.id === edge.conditionId)
+          ?? await prisma.condition.findUnique({ where: { id: edge.conditionId } });
+        const params = cond?.params as Record<string, any> | null;
+        const expr = params?.expression ?? params?.expr ?? null;
+        if (!expr) {
+          // skip branch if no expression
+          continue;
+        }
+        let pass = false;
+        try {
+          pass = Boolean(await evalExpression(expr, ctx));
+        } catch (e: any) {
+          logger.error({ err: e, edgeId: edge.id }, "Condition eval failed");
+          pass = false;
+        }
+        if (!pass) continue;
+      }
+
+      // create next NodeRun
+      const nextNode = workflow.nodes.find((n) => n.id === edge.toNodeId);
+      const nextConfig = (nextNode?.config ?? {}) as any;
+      const retryCfg = (nextConfig.retry ?? {}) as { attempts?: number; delayMs?: number };
+
+      const attempts = retryCfg.attempts && retryCfg.attempts > 0 ? retryCfg.attempts : 3;
+      const delay = retryCfg.delayMs && retryCfg.delayMs > 0 ? retryCfg.delayMs : 2000;
+
+      const nextNodeRun = await prisma.nodeRun.create({
+        data: {
+          workflowRunId: workflowRun.id,
+          nodeId: edge.toNodeId,
+          status: NodeRunStatus.PENDING,
+          input: result.output ?? {},
+        },
+      });
+
+      await nodeQueue.add(
+        "execute",
+        { nodeRunId: nextNodeRun.id },
+        {
+          attempts,
+          backoff: { type: "exponential", delay },
+        }
+      );
+
+      logger.info({ nextNodeRunId: nextNodeRun.id, attempts, delay }, "Enqueued next nodeRun");
+    }
+  }
+
+  private async failNode(nodeRunId: string, message: string) {
+    try {
+      await prisma.nodeRun.update({
+        where: { id: nodeRunId },
+        data: { status: NodeRunStatus.FAILED, errorMessage: message, finishedAt: new Date() }
+      });
+
+      const nr = await prisma.nodeRun.findUnique({ where: { id: nodeRunId } });
+      if (nr) {
+        await prisma.workflowRun.update({
+          where: { id: nr.workflowRunId },
+          data: { status: WorkflowRunStatus.FAILED, finishedAt: new Date() }
+        });
+      }
+      logger.error({ nodeRunId, message }, "Node failed and workflow marked FAILED");
+    } catch (err) {
+      logger.error({ err, nodeRunId }, "failNode: DB update failed");
+    }
+  }
+
+  private async finishWorkflowRun(workflowRunId: string, output: object) {
+    await prisma.workflowRun.update({
+      where: { id: workflowRunId },
+      data: { status: WorkflowRunStatus.SUCCEEDED, finishedAt: new Date(), output }
+    });
+    logger.info({ workflowRunId }, "Workflow run finished SUCCEEDED");
+  }
+}
+
+export const engine = new Engine();
+</file>
+
+<file path="src/execution/expression-evaluator.ts">
+// src/execution/expression-evaluator.ts
+import Jexl from "jexl";
+
+/**
+ * Lightweight expression evaluator wrapper using Jexl.
+ * Returns evaluated value or throws descriptive error.
+ */
+
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Evaluates a Jexl expression against a given context object.
+ * Returns the evaluated value (can be any type) or throws an error if evaluation fails.
+ * @param {string} expression - The Jexl expression to evaluate.
+ * @param {any} [context] - The context object to use for evaluation. Optional.
+ * @returns {Promise<any>} - The evaluated value or a rejected promise with an error.
+ * @throws {Error} - If evaluation fails.
+ */
+/*******  5151bd3a-9e12-41f5-a39d-b9d3697e81a7  *******/export async function evalExpression(expression: string, context: any): Promise<any> {
+  if (!expression || typeof expression !== "string") return false;
+  try {
+    const result = await Jexl.eval(expression, context || {});
+    return result;
+  } catch (err: any) {
+    throw new Error(`Expression evaluation failed: ${String(err.message ?? err)}`);
+  }
+}
+
+/**
+ * Evaluate transforms: map of key -> expression string.
+ * Returns object with evaluated values.
+ */
+export async function evalTransforms(transforms: Record<string, string> | undefined, context: any) {
+  const out: Record<string, any> = {};
+  if (!transforms) return out;
+  for (const key of Object.keys(transforms)) {
+    try {
+      out[key] = await evalExpression(transforms[key], context);
+    } catch (err) {
+      out[key] = null;
+    }
+  }
+  return out;
+}
+</file>
+
+<file path="src/execution/node-registry.ts">
+// src/execution/node-registry.ts
+import { ActionNode } from "./nodes/action.node";
+import { HttpNode } from "./nodes/http.node";
+import { DelayNode } from "./nodes/delay.node";
+import { SlackNode } from "./nodes/slack.node";
+import { SheetsNode } from "./nodes/sheets.node";
+import { ConditionNode } from "./nodes/condition.node";
+import { EmailNode } from "./nodes/email.node";
+
+type ExecutorCtor = new (config: any) => { execute: (input: any) => Promise<any> };
+
+class NodeRegistry {
+  private map: Record<string, ExecutorCtor> = {
+    START: ActionNode,
+    ACTION: ActionNode,
+    HTTP: HttpNode,
+    DELAY: DelayNode,
+    SLACK: SlackNode,
+    SHEETS: SheetsNode,
+    CONDITION: ConditionNode,
+    EMAIL: EmailNode,
+    END: ActionNode,
+  };
+
+  getExecutor(type: string | null | undefined): ExecutorCtor | undefined {
+    if (!type) return undefined;
+    return this.map[type.toUpperCase()];
+  }
+
+  // optional: register custom node at runtime
+  register(type: string, ctor: ExecutorCtor) {
+    this.map[type.toUpperCase()] = ctor;
+  }
+}
+
+export const nodeRegistry = new NodeRegistry();
+</file>
+
+<file path="src/execution/nodes/action.node.ts">
+// src/execution/nodes/action.node.ts
+import { NodeExecutionResult } from "../types";
+import { actionRegistry } from "../../modules/actions/action-registry"; // if exists; fallback handled
+
+export class ActionNode {
+  private config: any;
+  constructor(config: any) {
+    this.config = config ?? {};
+  }
+
+  async execute(input: any): Promise<NodeExecutionResult> {
+    try {
+      if (this.config.action && actionRegistry && typeof actionRegistry[this.config.action] === "function") {
+        const out = await actionRegistry[this.config.action](input, this.config);
+        return { success: true, output: out ?? {} };
+      }
+    } catch (err: any) {
+      return { success: false, errorMessage: String(err?.message ?? err) };
+    }
+
+    // fallback: pass-through / transforms not implemented here
+    return { success: true, output: input ?? {} };
+  }
+}
+</file>
+
+<file path="src/execution/nodes/condition.node.ts">
+// src/execution/nodes/condition.node.ts
+import { NodeExecutionResult } from "../types";
+import { evalExpression } from "../expression-evaluator";
+
+export class ConditionNode {
+  private config: any;
+  constructor(config: any) { this.config = config ?? {}; }
+
+  async execute(input: any): Promise<NodeExecutionResult> {
+    const expr = this.config.expression ?? this.config.expr;
+    if (!expr) return { success: false, errorMessage: "Condition node missing expression" };
+
+    try {
+      const result = await evalExpression(expr, input ?? {});
+      // return boolean result in output
+      return { success: true, output: { condition: Boolean(result) } };
+    } catch (err: any) {
+      return { success: false, errorMessage: String(err?.message ?? err) };
+    }
+  }
+}
+</file>
+
+<file path="src/execution/nodes/delay.node.ts">
+// src/execution/nodes/delay.node.ts
+import { NodeExecutionResult } from "../types";
+
+export class DelayNode {
+  private config: any;
+  constructor(config: any) { this.config = config ?? {}; }
+
+  async execute(input: any): Promise<NodeExecutionResult> {
+    const ms = typeof this.config.ms === "number" ? this.config.ms : (this.config.seconds ? this.config.seconds * 1000 : 1000);
+    await new Promise<void>((res) => setTimeout(res, ms));
+    return { success: true, output: { delayedMs: ms } };
+  }
+}
+</file>
+
+<file path="src/execution/nodes/email.node.ts">
+// src/execution/nodes/email.node.ts
+import nodemailer from "nodemailer";
+import { NodeExecutionResult } from "../types";
+
+export class EmailNode {
+  private config: any;
+  constructor(config: any) { this.config = config ?? {}; }
+
+  async execute(input: any): Promise<NodeExecutionResult> {
+    const smtp = this.config.smtp ?? {
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT ?? 587),
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    };
+    const tls={
+    service: process.env.SMTP_SERVICE,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
+};
+
+    if (!smtp) return { success: false, errorMessage: "Email node missing SMTP config" };
+
+    const transporter = nodemailer.createTransport(tls);
+
+    const mail = {
+      from: this.config.from ?? smtp.auth?.user,
+      to: this.config.to,
+      subject: this.config.subject ?? "Workflow Notification",
+      text: this.config.text ?? JSON.stringify(input),
+      html: this.config.html,
+    };
+
+    if (!mail.to) return { success: false, errorMessage: "Email node requires 'to' address" };
+
+    try {
+      await transporter.sendMail(mail);
+      return { success: true, output: { email_sent: true } };
+    } catch (err: any) {
+      return { success: false, errorMessage: String(err?.message ?? err) };
+    }
+  }
+}
+</file>
+
+<file path="src/execution/nodes/http.node.ts">
+// src/execution/nodes/http.node.ts
+import axios, { Method ,AxiosRequestConfig } from "axios";
+import { NodeExecutionInput,NodeExecutionResult } from "../types";
+
+interface HttpNodeConfig {
+  url: string;
+  method?: Method;
+  headers?: Record<string, string>;
+  body?: any;
+  timeoutMs?: number;
+}
+export class HttpNode {
+  private config: any;
+  constructor(config: any) {
+    this.config = {
+      url: config.url,
+      method: (config.method || "GET") as Method,
+      headers: config.headers || {},
+      body: config.body,
+      timeoutMs: config.timeoutMs || 10000, // default 10s
+    };
+  }
+
+async execute(input: NodeExecutionInput): Promise<NodeExecutionResult> {
+    try {
+      const response = await axios.request({
+        url: this.config.url,
+        method: this.config.method,
+        headers: this.config.headers,
+        data: this.config.body ?? input,
+        timeout: this.config.timeoutMs,
+      });
+
+      return {
+        success: true,
+        output: {
+          status: response.status,
+          data: response.data,
+          headers: response.headers,
+        },
+      };
+    } catch (err: any) {
+      const msg = err?.message || "HTTP request failed";
+      return {
+        success: false,
+        errorMessage: msg,
+      };
+    }
+  }
+}
+</file>
+
+<file path="src/execution/types.ts">
+// src/execution/types.ts
+export type JsonObject = { [key: string]: any };
+
+export interface NodeConfig {
+  // shape is flexible; each node reads what it needs
+  [key: string]: any;
+}
+
+export interface NodeExecutionInput {
+  // the context passed into node; keep as JSON object for flexibility
+  [key: string]: any;
+}
+
+export interface NodeExecutionResult {
+  success: boolean;
+  output?: JsonObject | null;
+  errorMessage?: string | null;
+}
+</file>
+
+<file path="src/lib/google.ts">
+import { google } from "googleapis";
+
+export function getGoogleClient() {
+  const email = process.env.GOOGLE_SA_EMAIL;
+  const key = process.env.GOOGLE_SA_KEY;
+
+  if (!email || !key) throw new Error("Google SA credentials missing");
+
+  const jwt = new google.auth.JWT({
+    email,
+    key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+  });
+
+  return google.sheets({ version: "v4", auth: jwt });
+}
+</file>
+
+<file path="src/lib/logger.ts">
+import pino from "pino";
+export const logger = pino({ level: "info" });
+</file>
+
+<file path="src/middleware/auth.ts">
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+
+export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ message: "No token" });
+
+  const token = header.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_SECRET!);
+    (req as any).user = decoded;
+    next();
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+export const hasRole = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    if (!roles.includes(user.role)) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    next();
+  };
+};
+</file>
+
+<file path="src/modules/actions/action-registry.ts">
+// src/modules/actions/action-registry.ts
+import axios from "axios";
+import { logger } from "../../lib/logger";
+
+/**
+ * Action handlers return a plain object to be merged into context.
+ * Add new handlers here.
+ */
+export const actionRegistry: Record<string, (context: any, config: any) => Promise<any>> = {
+  // HTTP wrapper action (alternative to HTTP node)
+  http_request: async (context, config) => {
+    const method = (config.method || "GET").toUpperCase();
+    const url = config.url;
+    const payload = config.body ?? context;
+    const headers = config.headers ?? {};
+    const res = await axios.request({ method, url, data: payload, headers, timeout: 15000 });
+    return { http_response: res.data };
+  },
+
+  // Simulated story generation (MVP stub)
+  generate_story: async (context, config) => {
+    const prompt = config.prompt || "Write a short Hindi story about courage.";
+    const generated = {
+      title: "Simulated Story",
+      story: `Generated story for prompt: ${prompt}`,
+      quality: "high"
+    };
+    logger.info({ generated }, "generate_story produced output");
+    return { story: generated };
+  },
+
+  // Post to Slack via webhook
+  post_to_slack: async (context, config) => {
+    const webhookUrl = config.webhookUrl;
+    const message = config.message ?? JSON.stringify(context);
+    await axios.post(webhookUrl, { text: message });
+    return { slack_sent: true };
+  },
+
+  // Write a row to Google Sheet via NoCodeAPI / Sheety
+  write_sheet: async (context, config) => {
+    const url = config.sheetUrl;
+    const payload = config.row ?? {};
+    await axios.post(url, payload);
+    return { sheet_row_added: true };
+  }
+};
+</file>
+
+<file path="src/modules/auth/auth.controller.ts">
+import { prisma } from "../../db/client";
+import { hashPassword, comparePassword } from "../../utils/hash";
+import { generateTokens } from "../../utils/jwt";
+import { Request, Response } from "express";
+
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    const userExists = await prisma.user.findUnique({ where: { email } });
+    if (userExists) return res.status(409).json({ message: "User exists" });
+
+    const hashed = await hashPassword(password);
+
+    const user = await prisma.user.create({
+      data: { name, email, password: hashed, role }
+    });
+
+    return res.json({ message: "Registered", user });
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "Not found" });
+
+  const ok = await comparePassword(password, user.password);
+  if (!ok) return res.status(401).json({ message: "Invalid password" });
+
+  const tokens = generateTokens({ id: user.id, role: user.role });
+
+  return res.json({
+    message: "Logged in",
+    user: { id: user.id, email: user.email, role: user.role },
+    ...tokens
+  });
+};
+</file>
+
+<file path="src/modules/workflow/condition.controller.ts">
+import { Request, Response } from "express";
+import { prisma } from "../../db/client";
+
+/**
+ * Create a condition for a workflow
+ * Body: { name, type, params (JSON) }
+ */
+export const createCondition = async (req: Request, res: Response) => {
+  try {
+    const { workflowId } = req.params;
+    const user = (req as any).user;
+    const { name, type, params } = req.body;
+
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId }});
+    if (!wf) return res.status(404).json({ message: "Workflow not found" });
+    if (wf.ownerId !== user.id && (user.role !== "ADMIN" && user.role !== "CREATOR")) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const condition = await prisma.condition.create({
+      data: {
+        workflowId,
+        name,
+        type,
+        params
+      }
+    });
+
+    return res.json({ message: "Condition created", condition });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err });
+  }
+};
+</file>
+
+<file path="src/modules/workflow/edge.controller.ts">
+import { Request, Response } from "express";
+import { prisma } from "../../db/client";
+
+/**
+ * Create an edge between nodes in workflow
+ * Body: { toNodeId, conditionId? }
+ * fromNodeId is from the URL param :nodeId
+ */
+export const createEdge = async (req: Request, res: Response) => {
+  try {
+    const { workflowId, nodeId } = req.params;
+    const user = (req as any).user;
+    const { toNodeId, conditionId } = req.body;
+
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId }});
+    if (!wf) return res.status(404).json({ message: "Workflow not found" });
+    if (wf.ownerId !== user.id && (user.role !== "ADMIN" && user.role !== "CREATOR")) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    // validate nodes
+    const fromNode = await prisma.node.findUnique({ where: { id: nodeId }});
+    const toNode = await prisma.node.findUnique({ where: { id: toNodeId }});
+    if (!fromNode || !toNode) return res.status(404).json({ message: "Node(s) not found" });
+
+    const edge = await prisma.edge.create({
+      data: {
+        workflowId,
+        fromNodeId: nodeId,
+        toNodeId,
+        conditionId
+      }
+    });
+
+    return res.json({ message: "Edge created", edge });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err });
+  }
+};
+</file>
+
+<file path="src/modules/workflow/node.controller.ts">
+import { Request, Response } from "express";
+import { prisma } from "../../db/client";
+
+/**
+ * Create a node inside a workflow
+ * Body: { name, type, config?, position? }
+ */
+export const createNode = async (req: Request, res: Response) => {
+  try {
+    const { workflowId } = req.params;
+    const user = (req as any).user;
+    const { name, type, config, position } = req.body;
+
+    // verify ownership or admin
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId }});
+    if (!wf) return res.status(404).json({ message: "Workflow not found" });
+    if (wf.ownerId !== user.id && (user.role !== "ADMIN" && user.role !== "CREATOR")) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const node = await prisma.node.create({
+      data: {
+        workflowId,
+        name,
+        type,
+        config,
+        position
+      }
+    });
+
+    return res.json({ message: "Node created", node });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err });
+  }
+};
+</file>
+
+<file path="src/modules/workflow/structure.controller.ts">
+import { Request, Response } from "express";
+import { prisma } from "../../db/client";
+
+/**
+ * Returns nodes, edges, conditions in one shape for UI consumption
+ */
+export const getStructure = async (req: Request, res: Response) => {
+  try {
+    const { workflowId } = req.params;
+    const user = (req as any).user;
+
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId }});
+    if (!wf) return res.status(404).json({ message: "Workflow not found" });
+    // allow owner or admin or viewer if public (for now enforce owner/admin)
+    if (wf.ownerId !== user.id && (user.role !== "ADMIN" && user.role !== "CREATOR")) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const [nodes, edges, conditions] = await Promise.all([
+      prisma.node.findMany({ where: { workflowId } }),
+      prisma.edge.findMany({ where: { workflowId } }),
+      prisma.condition.findMany({ where: { workflowId } })
+    ]);
+
+    return res.json({ nodes, edges, conditions });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err });
+  }
+};
+</file>
+
+<file path="src/modules/workflows/run.service.ts">
+// src/modules/workflows/run.service.ts
+import { prisma } from "../../db/client";
+import { workflowQueue } from "../../queue/bull.config";
+import { v4 as uuidv4 } from "uuid";
+
+export class RunService {
+  async startRun(workflowId: string, input?: any, userId?: string) {
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId },
+    include: {
+      nodes: true,
+      edges: true,
+    }, });
+    
+    if (!wf) throw new Error("Workflow not found");
+      // --- VALIDATIONS ---
+  const hasStart = wf.nodes.some((n) => n.type === "START");
+  if (!hasStart) throw new Error("Workflow missing START node");
+
+  const hasEnd = wf.nodes.some((n) => n.type === "END");
+  if (!hasEnd) throw new Error("Workflow missing END node");
+  // Optionally: ensure graph connectivity
+  if (wf.nodes.length > 1 && wf.edges.length === 0) {
+    throw new Error("Workflow has multiple nodes but no edges");
+  }
+    // create a WorkflowRun entry 
+    const run = await prisma.workflowRun.create({
+      data: {
+        workflowId,
+        status: "PENDING",
+        input
+      }
+    });
+
+    // enqueue job to process it
+   let job = await workflowQueue.add(
+      "run",
+      { workflowRunId: run.id },
+      { attempts: 3, backoff: { type: "exponential", delay: 2000 } }
+    );
+   
+    return run;
+  }
+}
+</file>
+
+<file path="src/modules/workflows/schedule.controller.ts">
+// src/modules/workflows/schedule.controller.ts
+import { Request, Response } from "express";
+import { prisma } from "../../db/client";
+import { workflowQueue } from "../../queue/bull.config";
+
+export async function scheduleWorkflow(req: Request, res: Response) {
+  try {
+    const { workflowId } = req.params;
+    const { cron, input } = req.body; // e.g. "0 9 * * *" (every day at 9am)
+
+    if (!cron || typeof cron !== "string") {
+      return res.status(400).json({ message: "cron is required (string)" });
+    }
+
+    const wf = await prisma.workflow.findUnique({ where: { id: workflowId } });
+    if (!wf) return res.status(404).json({ message: "Workflow not found" });
+
+    // Optional: check owner vs current user from req.user
+
+    const job = await workflowQueue.add(
+      "run",
+      {
+        workflowId,
+        input: input ?? {},
+      },
+      {
+        // TS types may not include 'cron' on RepeatOptions depending on Bull/BullMQ version; cast to any
+        repeat: { cron } as any, // BullMQ cron pattern
+      }
+    );
+
+    return res.json({
+      message: "Scheduled workflow",
+      workflowId,
+      cron,
+      bullJobName: job.name,
+      bullJobId: job.id,
+    });
+  } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({ message: "Failed to schedule workflow", error: String(err.message ?? err) });
+  }
+}
+</file>
+
+<file path="src/queue/bull.config.ts">
+// src/queue/bull.config.ts
+import { Queue, Worker, QueueEvents  } from "bullmq";
+import IORedis from "ioredis";
+import config from "../config";
+
+const connection = new IORedis(config.redisUrl,{
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
+console.log("bullPrefix URL:", config.bullPrefix);
+export const workflowQueue = new Queue("workflow_run", { connection, prefix: config.bullPrefix });
+export const workflowQueueEvents  = new QueueEvents("workflow_run", { connection, prefix: config.bullPrefix });
+
+// src/queue/bull.config.ts
+
+export function createWorker(processor: (job: any) => Promise<void>) {
+  console.log("Node Worker started...");
+  return new Worker(
+    "node_execute",          // ✅ CORRECT QUEUE FOR NODE EXECUTION
+    async job => {
+      await processor(job);
+    },
+    { connection, prefix: config.bullPrefix }
+  );
+}
+
+// Optional event logging
+workflowQueueEvents.on("completed", ({ jobId }) => {
+  console.log(`Job ${jobId} completed`);
+});
+
+workflowQueueEvents.on("failed", ({ jobId, failedReason }) => {
+  console.error(`Job ${jobId} failed: ${failedReason}`);
+});
+export const nodeQueue  = new Queue("node_execute", {
+  connection,
+  prefix: config.bullPrefix
+});
+export const nodeQueueEvents = new QueueEvents("node_execute", {
+  connection,
+  prefix: config.bullPrefix
+});
+</file>
+
+<file path="src/queue/nodeQueue.config.ts">
+import { Queue, Worker } from "bullmq";
+import IORedis from "ioredis";
+import config from "../config";
+
+const connection = new IORedis(config.redisUrl, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
+export const nodeQueue = new Queue("node_execute", {
+  connection,
+  prefix: config.bullPrefix,
+});
+
+export const createNodeWorker = (processor:any) =>
+  new Worker("node_execute", processor, {
+    connection,
+    prefix: config.bullPrefix,
+  });
+</file>
+
+<file path="src/routes/auth.routes.ts">
+import { Router } from "express";
+import { register, login } from "../modules/auth/auth.controller";
+
+const router = Router();
+
+router.post("/register", register);
+router.post("/login", login);
+
+export default router;
+</file>
+
+<file path="src/routes/condition.routes.ts">
+import { Router } from "express";
+import { createCondition } from "../modules/workflow/condition.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router({ mergeParams: true });
+
+// POST /workflow/:workflowId/conditions
+router.post("/", isAuthenticated, hasRole("ADMIN", "CREATOR"), createCondition);
+
+export default router;
+</file>
+
+<file path="src/routes/edge.routes.ts">
+import { Router } from "express";
+import { createEdge } from "../modules/workflow/edge.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router({ mergeParams: true });
+
+// create edge from nodeId: POST /workflow/:workflowId/nodes/:nodeId/edges
+router.post("/:nodeId/edges", isAuthenticated, hasRole("ADMIN", "CREATOR"), createEdge);
+
+export default router;
+</file>
+
+<file path="src/routes/health.ts">
+import { Router } from "express";
+
+const router = Router();
+
+router.get("/", (req, res) => {
+  res.json({ ok: true });
+});
+
+export default router;
+</file>
+
+<file path="src/routes/node.routes.ts">
+import { Router } from "express";
+import { createNode } from "../modules/workflow/node.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router({ mergeParams: true });
+
+// create node: POST /workflow/:workflowId/nodes
+router.post("/", isAuthenticated, hasRole("ADMIN", "CREATOR"), createNode);
+
+export default router;
+</file>
+
+<file path="src/routes/run.routes.ts">
+// src/routes/run.routes.ts
+import { Router } from "express";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+import { RunService } from "../modules/workflows/run.service";
+const router = Router({ mergeParams: true });
+const svc = new RunService();
+
+// POST /workflow/:workflowId/run
+router.post("/", isAuthenticated, hasRole("ADMIN", "CREATOR"), async (req: any, res) => {
+  const workflowId = req.params.workflowId;
+  const input = req.body;
+  try {
+   
+    const run = await svc.startRun(workflowId, input, req.user.id);
+    res.json(run);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+export default router;
+</file>
+
+<file path="src/routes/schedule.routes.ts">
+// src/routes/schedule.routes.ts
+import { Router } from "express";
+import { scheduleWorkflow } from "../modules/workflows/schedule.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router({ mergeParams: true });
+
+// POST /workflow/:workflowId/schedule
+router.post("/", isAuthenticated, hasRole("ADMIN", "CREATOR"), scheduleWorkflow);
+
+export default router;
+</file>
+
+<file path="src/routes/structure.routes.ts">
+import { Router } from "express";
+import { getStructure } from "../modules/workflow/structure.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router({ mergeParams: true });
+
+// GET /workflow/:workflowId/structure
+router.get("/structure", isAuthenticated, hasRole("ADMIN", "CREATOR", "VIEWER"), getStructure);
+
+export default router;
+</file>
+
+<file path="src/routes/workflow.routes.ts">
+import { Router } from "express";
+import { createWorkflow, listWorkflow, getWorkflowById } from "../modules/workflow/workflow.controller";
+import { isAuthenticated, hasRole } from "../middleware/auth";
+
+const router = Router();
+
+router.post("/", isAuthenticated, hasRole("ADMIN", "CREATOR"), createWorkflow);
+router.get("/", isAuthenticated, hasRole("ADMIN", "CREATOR", "VIEWER"), listWorkflow);
+router.get("/:workflowId", isAuthenticated, getWorkflowById);
+
+
+export default router;
+</file>
+
+<file path="src/tests/__mocks__/axios.ts">
+export default {
+    post: jest.fn(),
+    get: jest.fn()
+};
+</file>
+
+<file path="src/tests/__mocks__/prismaMock.ts">
+import { mockDeep } from "jest-mock-extended";
+import { PrismaClient } from "@prisma/client";
+
+export const prismaMock = mockDeep<PrismaClient>();
+</file>
+
+<file path="src/tests/delay.node.test.ts">
+import { DelayNode } from "../execution/nodes/delay.node";
+
+jest.useFakeTimers();
+
+test("Delay waits specified milliseconds", async () => {
+  const node = new DelayNode({ ms: 1000 });
+
+  const promise = node.execute({});
+  jest.advanceTimersByTime(1000);
+
+  const result = await promise;
+  expect(result.success).toBe(true);
+});
+</file>
+
+<file path="src/tests/engine.test.ts">
+import { engine } from "../execution/engine";
+import { prismaMock } from "./__mocks__/prismaMock";
+
+jest.mock("../db/client", () => ({
+  prisma: require("./__mocks__/prismaMock").prismaMock
+}));
+
+describe("Engine", () => {
+  it("executes start node and creates next nodeRun", async () => {
+    prismaMock.nodeRun.findUnique.mockResolvedValue({
+      id: "n1",
+      input: {},
+      node: { id: "start1", type: "START", config: {} },
+      workflowRun: {
+        id: "run1",
+        workflow: {
+          edges: [{ fromNodeId: "start1", toNodeId: "next" }],
+          nodes: [],
+          conditions: []
+        }
+      }
+    });
+
+    prismaMock.nodeRun.update.mockResolvedValue({});
+    prismaMock.nodeRun.create.mockResolvedValue({ id: "n2" });
+
+    await engine.executeNodeRun("n1");
+
+    expect(prismaMock.nodeRun.create).toHaveBeenCalled();
+  });
+});
+</file>
+
+<file path="src/tests/http.node.test.ts">
+import axios from "axios";
+import { HttpNode } from "../execution/nodes/http.node";
+
+describe("HTTP Node", () => {
+  beforeEach(() => jest.resetAllMocks());
+
+  it("performs GET request", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ data: { ok: true } });
+
+    const node = new HttpNode({
+      method: "GET",
+      url: "https://api.test"
+    });
+
+    const res = await node.execute({});
+    expect(res.success).toBe(true);
+  });
+});
+</file>
+
+<file path="src/tests/slack.node.test.ts">
+import { SlackNode } from "../execution/nodes/slack.node";
+import axios from "axios";
+
+describe("SlackNode", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("sends message via webhook", async () => {
+    (axios.post as jest.Mock).mockResolvedValue({ status: 200 });
+
+    const node = new SlackNode({
+      webhookUrl: "https://hooks.test/slack",
+      message: "hello"
+    });
+
+    const result = await node.execute({});
+
+    expect(result.success).toBe(true);
+    expect(axios.post).toHaveBeenCalled();
+  });
+
+  it("sends message via bot token", async () => {
+    (axios.post as jest.Mock).mockResolvedValue({ data: { ok: true } });
+
+    const node = new SlackNode({
+      channel: "#demo",
+      message: "test-msg",
+      botToken: "xoxb-123"
+    });
+
+    const res = await node.execute({});
+    expect(res.success).toBe(true);
+    expect(axios.post).toHaveBeenCalledWith(
+      "https://slack.com/api/chat.postMessage",
+      expect.anything(),
+      expect.objectContaining({
+        headers: expect.anything()
+      })
+    );
+  });
+});
+</file>
+
+<file path="src/types/jexl.d.ts">
+declare module "jexl" {
+  const Jexl: any;
+  export default Jexl;
+}
+</file>
+
+<file path="src/utils/hash.ts">
+import bcrypt from "bcrypt";
+
+export const hashPassword = async (plain: string) => {
+  return await bcrypt.hash(plain, 10);
+};
+
+export const comparePassword = async (plain: string, hash: string) => {
+  return await bcrypt.compare(plain, hash);
+};
+</file>
+
+<file path="src/utils/jwt.ts">
+import jwt from "jsonwebtoken";
+
+const ACCESS_SECRET = process.env.ACCESS_SECRET!;
+const REFRESH_SECRET = process.env.REFRESH_SECRET!;
+
+export const generateTokens = (payload: any) => {
+  const accessToken = jwt.sign(payload, ACCESS_SECRET, { expiresIn: "15m" });
+  const refreshToken = jwt.sign(payload, REFRESH_SECRET, { expiresIn: "7d" });
+
+  return { accessToken, refreshToken };
+};
+
+export const verifyAccessToken = (token: string) => {
+  return jwt.verify(token, ACCESS_SECRET);
+};
+</file>
+
+<file path="src/worker-node.ts">
+// src/worker-node.ts
+import dotenv from "dotenv";
+import { createWorker } from "./queue/bull.config";
+import { engine } from "./execution/engine";
+import { logger } from "./lib/logger";
+
+dotenv.config();
+
+const processor = async (job: any) => {
+  const nodeRunId: string = job.data?.nodeRunId;
+  if (!nodeRunId) throw new Error("Missing nodeRunId");
+  logger.info({ nodeRunId }, "node-worker processing");
+  await engine.executeNodeRun(nodeRunId);
+};
+
+const worker = createWorker(processor);
+
+// optional events
+worker.on("completed", (job) => logger.info({ jobId: job.id }, "node job completed"));
+worker.on("failed", (job, err) => logger.error({ jobId: job?.id, err }, "node job failed"));
+</file>
+
+<file path="tools/convert-key.ps1">
+$path = Read-Host "../sa.json"
+$json = Get-Content $path -Raw | ConvertFrom-Json
+$key = $json.private_key -replace "`n","\\n"
+Write-Host "`nAdd to .env:`n"
+Write-Host "GOOGLE_SA_EMAIL=$($json.client_email)"
+Write-Host "GOOGLE_SA_KEY=\"$key\""
+</file>
+
+<file path=".gitignore">
+node_modules
+dist
+prisma/migrations
+
+/src/generated/prisma
+</file>
+
+<file path="src/db/client.ts">
+import { PrismaClient } from "@prisma/client";
+
+export const prisma = new PrismaClient();
+
+if (process.env.NODE_ENV === "test") {
+  // Replace at runtime in tests
+}
+</file>
+
+<file path="src/execution/nodes/sheets.node.ts">
+import axios from "axios";
+import { NodeExecutionResult } from "../types";
+import { getGoogleClient } from "../../lib/google";
+
+export class SheetsNode {
+  private config: any;
+
+  constructor(config: any) {
+    this.config = config ?? {};
+  }
+
+  async execute(input: any): Promise<NodeExecutionResult> {
+    const sheetId = this.config.sheetId;
+    const range = this.config.range ?? "Sheet1!A:Z";
+    const mode = this.config.mode ?? "append"; // "append" | "read"
+    const fallbackUrl = this.config.fallbackUrl ?? process.env.SHEETY_URL;
+
+    try {
+      if (!sheetId) {
+        // fallback to simple API
+        if (!fallbackUrl) {
+          return { success: false, errorMessage: "sheetId or fallbackUrl required" };
+        }
+        const payload = this.config.row ?? input ?? {};
+        const res = await axios.post(fallbackUrl, payload);
+        return { success: true, output: { sheety_response: res.data } };
+      }
+
+      // REAL GOOGLE API MODE
+      const sheets = getGoogleClient();
+
+      if (mode === "append") {
+        const row = this.config.row ?? input ?? {};
+        const values = [Object.values(row)];
+
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range,
+          valueInputOption: "USER_ENTERED",
+          requestBody: { values }
+        });
+
+        return { success: true, output: { google: "row_appended", values } };
+      }
+
+      if (mode === "read") {
+        const result = await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetId,
+          range
+        });
+        return { success: true, output: { rows: result.data.values ?? [] } };
+      }
+
+      return { success: false, errorMessage: "Invalid mode" };
+    } catch (err: any) {
+      return { success: false, errorMessage: String(err?.message ?? err) };
+    }
+  }
+}
+</file>
+
+<file path="src/execution/nodes/slack.node.ts">
+// src/execution/nodes/slack.node.ts
+import axios from "axios";
+import { NodeExecutionInput, NodeExecutionResult } from "../types";
+
+interface SlackConfig {
+  webhookUrl?: string;    
+  token?: string;         // Bot token for advanced mode
+  channel?: string;
+  message?: string;
+  blocks?: any[];
+  threadTs?: string;
+}
+
+export class SlackNode {
+  constructor(private config: SlackConfig = {}) {}
+
+  async execute(input: NodeExecutionInput): Promise<NodeExecutionResult> {
+    try {
+      //  MODE 1: Incoming Webhook
+      if (this.config.webhookUrl) {
+        await axios.post(this.config.webhookUrl,
+          { text: this.config.message ?? JSON.stringify(input) },
+          { timeout: 8000 }
+        );
+
+        return { success: true, output: { sent: true, mode: "webhook" } };
+      }
+
+      //  MODE 2: Bot Token (Chat.postMessage)
+      if (this.config.token && this.config.channel) {
+        const payload: any = {
+          channel: this.config.channel,
+          text: this.config.message ?? "Workflow message",
+          blocks: this.config.blocks ?? undefined,
+          thread_ts: this.config.threadTs ?? undefined
+        };
+
+        const resp = await axios.post(
+          "https://slack.com/api/chat.postMessage",
+          payload,
+          {
+            headers: { Authorization: `Bearer ${this.config.token}` },
+            timeout: 8000
+          }
+        );
+
+        if (!resp.data.ok) {
+          return { success: false, errorMessage: resp.data.error };
+        }
+
+        return { success: true, output: resp.data };
+      }
+
+      return { success: false, errorMessage: "Slack config incomplete" };
+    } catch (err: any) {
+      return { success: false, errorMessage: err.message };
+    }
+  }
+}
+</file>
+
+<file path="src/modules/workflow/workflow.controller.ts">
+import { prisma } from "../../db/client";
+import { Request, Response } from "express";
+
+export const createWorkflow = async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { name, description } = req.body;
+
+    const workflow = await prisma.workflow.create({
+      data: {
+        name,
+        description,
+        ownerId: user.id
+      }
+    });
+
+    return res.json({ message: "Workflow created", workflow });
+  } catch (err) {
+    return res.status(500).json({ error: err });
+  }
+};
+
+export const listWorkflow = async (req: Request, res: Response) => {
+  try {
+    const workflows = await prisma.workflow.findMany({
+      include: { nodes: true, owner: true }
+    });
+    res.json(workflows);
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+
+}
+export const getWorkflowById = async (req: Request, res: Response) => {
+  const { workflowId } = req.params;
+
+  const workflow = await prisma.workflow.findUnique({
+    where: { id: workflowId },
+    include: {
+      nodes: true,
+      edges: true,
+      conditions: true,
+    },
+  });
+
+  if (!workflow) {
+    return res.status(404).json({ message: "Workflow not found" });
+  }
+
+  res.json(workflow);
+};
+</file>
+
+<file path="src/worker.ts">
+// src/worker.ts
+import { WorkflowRunStatus, PrismaClient } from "@prisma/client";
+import { logger } from "./lib/logger";
+import dotenv from "dotenv";
+import { Worker } from "bullmq";
+import { workflowQueue, nodeQueue } from "./queue/bull.config";
+
+dotenv.config();
+
+const prisma = new PrismaClient();
+
+// Use the SAME redis connection + prefix as bull.config.ts
+const connection = {
+  host: "localhost",
+  port: 6379,
+};
+
+const prefix = process.env.BULL_PREFIX || "flow";
+
+logger.info("🚀 Starting WorkflowRun Worker...");
+
+/**
+ * WORKFLOW RUN WORKER
+ * - Picks jobs from workflow_run
+ * - Finds START node
+ * - Creates NodeRun
+ * - Enqueues node_execute job
+ */
+const workflowWorker = new Worker(
+  "workflow_run",
+  async (job) => {
+
+
+    const { workflowRunId, workflowId, input } = job.data || {};
+    logger.info({ jobId: job.id, workflowRunId, workflowId }, "⚙ Processing workflow job");
+    let wr = null;
+    if (workflowRunId) {
+      wr = await prisma.workflowRun.findUnique({
+        where: { id: workflowRunId },
+        include: {
+          workflow: {
+            include: {
+              nodes: { orderBy: { position: "asc" } },
+              edges: true,
+              conditions: true,
+            },
+          },
+        },
+      });
+
+      if (!wr) {
+        logger.error("❌ WorkflowRun not found");
+        return;
+      }
+    } else if (workflowId) {
+      const wf = await prisma.workflow.findUnique({
+        where: { id: workflowId },
+        include: {
+          nodes: { orderBy: { position: "asc" } },
+          edges: true,
+          conditions: true,
+        },
+      });
+
+      if (!wf) {
+        logger.error({ workflowId }, "❌ Workflow not found for scheduled job");
+        return;
+      }
+      wr = await prisma.workflowRun.create({
+        data: {
+          workflowId: wf.id,
+          status: WorkflowRunStatus.PENDING,
+          input: input ?? {},
+        },
+        include: {
+          workflow: {
+            include: {
+              nodes: { orderBy: { position: "asc" } },
+              edges: true,
+              conditions: true,
+            },
+          },
+        },
+      });
+      logger.info({ workflowRunId: wr.id }, "🆕 Created WorkflowRun for scheduled job");
+    } else {
+      logger.error("❌ Job missing workflowRunId and workflowId");
+      return;
+    }
+    const nodes = wr.workflow.nodes;
+    if (!nodes.length) {
+      logger.error("❌ No nodes in workflow");
+      return;
+    }
+
+    const startNode = nodes.find((n) => n.type === "START");
+    if (!startNode) {
+      logger.error("❌ No START node found");
+      return;
+    }
+
+    logger.info(`📌 START node = ${startNode.id}`);
+
+    const nodeRun = await prisma.nodeRun.create({
+      data: {
+        nodeId: startNode.id,
+        workflowRunId,
+        status: "PENDING",
+        input: wr.input ?? {},
+      },
+    });
+
+    logger.info(`🟢 NodeRun created ${nodeRun.id}`);
+
+    // enqueue execution for node
+    await nodeQueue.add(
+      "execute",
+      { nodeRunId: nodeRun.id },
+      {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 2000 },
+      }
+    );
+
+    await prisma.workflowRun.update({
+      where: { id: workflowRunId },
+      data: {
+        status: WorkflowRunStatus.RUNNING,
+        startedAt: new Date(),
+      },
+    });
+
+    logger.info(`🚀 WorkflowRun ${workflowRunId} is now RUNNING`);
+  },
+  { connection, prefix }
+);
+
+// events
+workflowWorker.on("completed", (job) => {
+  logger.info(`✅ WorkflowRun job ${job.id} completed`);
+});
+
+workflowWorker.on("failed", (job, err) => {
+  logger.error(`❌ WorkflowRun job ${job?.id} failed: ${err.message}`);
+});
+
+// Start node worker
+logger.info("🚀 Starting Node Worker...");
+
+// import { createWorker } from "./queue/bull.config";
+// import { engine } from "./execution/engine";
+
+// createWorker(async (job) => {
+//   logger.info(`⚙️ NodeWorker executing nodeId=${job.data.nodeId}`);
+//   await engine.executeNodeRun(job.data.nodeRunId);
+// });
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src","src/types"]
+}
+</file>
+
+<file path="prisma/schema.prisma">
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String
+  role      Role        @default(CREATOR)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  // for OAuth tokens we can store optional fields later
+  workflows Workflow[]
+}
+
+model Workflow {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  ownerId      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  nodes        Node[]
+  owner        User          @relation(fields: [ownerId], references: [id])
+  workflowRuns WorkflowRun[]
+  edges Edge[]
+  conditions Condition[]
+}
+
+model Node {
+  id         String    @id @default(cuid())
+  workflowId String
+  name       String
+  type       NodeType @default(START) 
+  config     Json?
+  position   Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  workflow   Workflow  @relation(fields: [workflowId], references: [id])
+  outgoingEdges Edge[] @relation("edge_from")
+  incomingEdges Edge[] @relation("edge_to")
+  runs       NodeRun[]
+}
+
+model Condition {
+  id         String        @id @default(uuid())
+  workflowId String
+  name       String
+  type       ConditionType @default(EXPRESSION)
+  // params: expression, key/value, etc.
+  params     Json?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  workflow Workflow @relation(fields: [workflowId], references: [id])
+  edges    Edge[] @relation("condition_edges")
+}
+
+model Edge {
+  id          String   @id @default(uuid())
+  workflowId  String
+  fromNodeId  String
+  toNodeId    String
+  conditionId String?  // nullable: edge may be unconditional
+  createdAt   DateTime @default(now())
+
+  workflow  Workflow  @relation(fields: [workflowId], references: [id])
+  fromNode  Node      @relation("edge_from", fields: [fromNodeId], references: [id])
+  toNode    Node      @relation("edge_to", fields: [toNodeId], references: [id])
+  condition Condition? @relation("condition_edges", fields: [conditionId], references: [id])
+}
+
+model WorkflowRun {
+  id         String    @id @default(cuid())
+  workflowId String
+  status     WorkflowRunStatus // 'pending', 'running', 'succeeded', 'failed', 'cancelled'
+  input      Json?
+  output     Json?
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  workflow   Workflow  @relation(fields: [workflowId], references: [id])
+  nodeRuns   NodeRun[]
+}
+
+model NodeRun {
+  id            String    @id @default(cuid())
+  nodeId        String
+  workflowRunId String
+  status        NodeRunStatus // pending/running/success/failed
+  attempt       Int       @default(0)
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  input         Json?
+  output        Json?
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  node        Node        @relation(fields: [nodeId], references: [id])
+  workflowRun WorkflowRun @relation(fields: [workflowRunId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  level     String
+  message   String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  CREATOR
+  VIEWER
+}
+enum NodeType {
+  START
+  ACTION     
+  HTTP
+  CONDITION
+  DELAY
+  SLACK
+  SHEETS
+  EMAIL
+  END
+}
+enum ConditionType {
+  EXPRESSION
+  EQUALS
+  EXISTS
+  CUSTOM
+}
+enum WorkflowRunStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+enum NodeRunStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}
+</file>
+
+<file path="README.md">
+# Flow – Distributed Workflow Engine (Capstone Project)
+
+Author: Vipul Jain  
+Submission Date: 23 Nov 2025
+
+## 1. Overview
+
+Flow is a backend workflow engine that lets users define and run DAG-based workflows composed of typed nodes:
+START → ACTION → HTTP → CONDITION → DELAY → EMAIL → (SLACK, SHEETS) → END.
+
+It supports:
+
+- JSON-based workflow definitions
+- Queue-based execution using Redis + BullMQ
+- Separate workflow_run and node_execute queues
+- Condition-based branching using an expression engine (Jexl)
+- Retry policies per node
+- HTTP timeouts per node
+- Manual + API + Scheduled (cron) triggers
+
+## 2. Tech Stack
+
+- Node.js + TypeScript
+- Express
+- PostgreSQL + Prisma ORM
+- Redis + BullMQ
+- Jexl (expression engine)
+- Jest (unit tests)
+- Docker + docker-compose (Postgres, Redis, Adminer)
+
+## 3. Architecture
+
+- **API Layer** (`src/server.ts` + routes)  
+  Handles auth, workflow CRUD, node/edge creation, run/schedule APIs.
+
+- **Persistence Layer** (`prisma/schema.prisma`, `src/db/client.ts`)  
+  Models: `User`, `Workflow`, `Node`, `Edge`, `Condition`, `WorkflowRun`, `NodeRun`, `Log`.
+
+- **Queue Layer** (`src/queue/bull.config.ts`)
+
+  - `workflowQueue` ("workflow_run") for starting runs
+  - `nodeQueue` ("node_execute") for node-level execution
+  - Workers provisioned via BullMQ `Worker`.
+
+- **Workers**
+
+  - `src/worker.ts` – workflow worker:
+    - For manual runs: consumes `{ workflowRunId }`
+    - For cron runs: consumes `{ workflowId, input }`, creates `WorkflowRun`
+    - Finds START node, creates first `NodeRun`, queues `node_execute`
+  - `src/worker-node.ts` – node worker:
+    - Consumes `{ nodeRunId }`
+    - Delegates to `engine.executeNodeRun(nodeRunId)`.
+
+- **Execution Engine** (`src/execution/engine.ts`)
+
+  - Loads `NodeRun` + `WorkflowRun` + graph (`nodes`, `edges`, `conditions`)
+  - Uses `nodeRegistry` to pick executor by node.type
+  - Executes node, updates NodeRun
+  - Evaluates conditions with Jexl for outgoing edges
+  - Creates next NodeRuns, enqueues into `node_execute`
+  - Finalizes `WorkflowRun` (SUCCEEDED/FAILED)
+
+- **Node Executors** (`src/execution/nodes/*.ts`)
+  - `ActionNode`, `HttpNode`, `ConditionNode`, `DelayNode`, `EmailNode`, (SlackNode, SheetsNode)
+  - Share a common contract: `execute(input) => { success, output?, errorMessage? }`.
+
+## 4. Running Locally
+
+```bash
+docker-compose up -d        # Postgres + Redis + Adminer
+npm install
+npx prisma migrate dev
+npx prisma generate
+npm run dev                 # API on :4000
+npm run worker              # workflow_run worker
+npm run node-worker         # node_execute worker
+
+
+To run the demo workflow:
+bash demo.sh
+
+## 5. Core APIs
+Auth
+
+POST /auth/register
+
+POST /auth/login
+
+Workflows
+
+POST /workflow — create workflow
+
+GET /workflow/:workflowId — get workflow (with nodes, edges, etc.)
+
+POST /workflow/:workflowId/nodes — add node
+
+POST /workflow/:workflowId/edge — add edge
+
+GET /workflow/:workflowId/structure — full graph (nodes + edges + conditions)
+
+Run / Schedule
+
+POST /workflow/:workflowId/run
+Body: { "input": { ... } }
+Creates WorkflowRun (manual API trigger).
+
+POST /workflow/:workflowId/schedule
+Body: { "cron": "*/5 * * * *", "input": { ... } }
+Creates cron-based schedule using BullMQ repeat.
+
+6. Node Configuration Examples
+HTTP Node
+{
+  "type": "HTTP",
+  "config": {
+    "url": "https://jsonplaceholder.typicode.com/todos/1",
+    "method": "GET",
+    "timeoutMs": 5000,
+    "retry": {
+      "attempts": 5,
+      "delayMs": 2000
+    }
+  }
+}
+
+CONDITION Node
+{
+  "type": "CONDITION",
+  "config": {
+    "expression": "output.data.id == 1"
+  }
+}
+7. Testing
+
+Jest + ts-jest configured
+
+Unit tests for:
+
+expression evaluator
+
+HttpNode, DelayNode, ConditionNode
+
+Engine (mocked Prisma + nodeRegistry)
+
+Run:
+
+npm test
+
+8. Future Enhancements
+
+Real Slack + Google Sheets integrations
+
+Web UI for workflow designer
+
+Real-time monitoring dashboard
+
+Advanced retry policies and circuit breakers
+
+
+---
+
+### 4.2 Final API docs (short, for submission)
+
+You already have most endpoints; you can copy the “Core APIs” section above into a separate `API_DOCS.md` if needed.
+
+---
+
+### 4.3 Architecture diagrams – what to draw
+
+You can quickly draw 2 diagrams in draw.io / Excalidraw:
+
+1. **High-level system overview**
+   - Boxes:
+     - Client (REST / Postman)
+     - API (Express, TS)
+     - Postgres (Prisma)
+     - Redis (BullMQ)
+     - Worker – Workflow
+     - Worker – Node
+   - Arrows:
+     - Client → API → Postgres (CRUD)
+     - API → workflowQueue ("workflow_run")
+     - Workflow Worker → nodeQueue ("node_execute")
+     - Node Worker → Engine → Postgres
+
+2. **Workflow execution flow**
+   - Steps:
+     1. `POST /workflow/:id/run`
+     2. API creates `WorkflowRun`, enqueue `"workflow_run"` with `{ workflowRunId }`
+     3. Workflow worker:
+        - Finds START node
+        - Creates first `NodeRun`
+        - Enqueues `"node_execute"` with `{ nodeRunId }`
+     4. Node worker:
+        - Executes node via executor
+        - Updates NodeRun
+        - Evaluates edges/conditions
+        - Enqueues next NodeRuns
+     5. Ends on END node → marks WorkflowRun SUCCEEDED
+
+Include these diagrams as PNG in your submission or link from README.
+
+---
+
+### 4.4 Final 1-pager text (you can paste into Word/PDF)
+
+**Title:**
+**Flow – Distributed Workflow Engine (Capstone Project)**
+
+**Problem**
+Modern products need to automate repetitive tasks across multiple systems (HTTP APIs, email, chat, data sinks). Building custom orchestration for every use case leads to duplicated logic, fragile cron scripts, and poor observability.
+
+**Solution**
+Flow is a backend workflow engine that allows defining JSON-based workflows composed of typed nodes (START, ACTION, HTTP, CONDITION, DELAY, EMAIL, SLACK, SHEETS, END). It executes workflows as DAGs using a queue-based architecture with strong persistence and observability. It supports manual, API, and scheduled (cron) triggers with per-node retry and timeout controls.
+
+**Key Features**
+- DAG-based workflow definitions (nodes + edges + conditions)
+- Node types:
+  - START, ACTION, HTTP, CONDITION, DELAY, EMAIL (Slack & Sheets as integrations)
+- Queue-based execution with Redis + BullMQ
+  - `workflow_run` queue for starting runs
+  - `node_execute` queue for node-level work
+- Persistent run tracking:
+  - `WorkflowRun` and `NodeRun` models store status, timestamps, input/output, and errors
+- Condition-based branching using Jexl expression engine
+- Retry policies per node and HTTP timeouts
+- Manual API trigger and cron-based scheduled triggers
+- Cleanly structured TypeScript backend with Prisma and Jest tests
+
+**Architecture**
+The system consists of:
+- An Express + TypeScript API for workflow and run management.
+- PostgreSQL (via Prisma) storing workflows, nodes, runs, and logs.
+- Redis + BullMQ handling scheduling, queues, and workers.
+- A workflow worker that starts runs and finds the START node.
+- A node worker that executes each node using typed executors and enqueues subsequent nodes.
+
+**Tech Stack**
+Node.js, TypeScript, Express, PostgreSQL, Prisma ORM, Redis, BullMQ, Jexl, Jest, Docker.
+
+**Demo**
+The demo creates a sample workflow:
+
+`START → ACTION → HTTP → CONDITION → DELAY → EMAIL → END`
+
+Then executes it via API, showing:
+- queue-based execution in Redis,
+- node-by-node logs in workers,
+- persisted workflow run history in Postgres.
+
+**Future Work**
+- Production-ready Slack and Google Sheets integrations
+- Web UI for visual workflow design
+- Real-time monitoring dashboard and replay of failed nodes.
+
+---
+
+If you want, next I can:
+
+- generate a **final `demo.ps1`** for Windows with token + workflow + all nodes,
+- or refine **unit tests** specifically around your engine and current node registry.
+
+GoogleService Account Email
+ workflow-backend@workflow-engine-480508.iam.gserviceaccount.com
+```
+</file>
+
+<file path="src/server.ts">
+import cors from "cors";
+import express from "express";
+import dotenv from "dotenv";
+import { prisma } from "./db/client";
+import { logger } from "./lib/logger";
+import healthRoute from "./routes/health";
+import authRoutes from "./routes/auth.routes";
+import workflowRoutes from "./routes/workflow.routes";
+import nodeRoutes from "./routes/node.routes";
+import edgeRoutes from "./routes/edge.routes";
+import conditionRoutes from "./routes/condition.routes";
+import structureRoutes from "./routes/structure.routes";
+import runRoutes from "./routes/run.routes";
+import scheduleRoutes from "./routes/schedule.routes";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+app.use(cors(
+  {
+    origin: "http://localhost:5173",
+    Credential: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTOIN"],
+    allowedHeaders: ['Content-type', "Authorization"]
+  }
+));
+app.use("/health", healthRoute);
+
+app.use("/auth", authRoutes);
+app.use("/workflow", workflowRoutes);
+
+// Mount nested routes that need workflowId param
+// nodes: POST /workflow/:workflowId/nodes
+app.use("/workflow/:workflowId/nodes", nodeRoutes);
+
+// edges: POST /workflow/:workflowId/nodes/:nodeId/edges
+app.use("/workflow/:workflowId/nodes", edgeRoutes);
+
+// conditions: POST /workflow/:workflowId/conditions
+app.use("/workflow/:workflowId/conditions", conditionRoutes);
+
+// structure: GET /workflow/:workflowId/structure
+app.use("/workflow/:workflowId", structureRoutes);
+
+// run: POST /workflow/:workflowId/run
+app.use("/workflow/:workflowId/run", runRoutes);
+app.use("/workflow/:workflowId/schedule", scheduleRoutes);
+const port = process.env.PORT || 4000;
+app.listen(port, async () => {
+  logger.info(`Server started on ${port}`);
+  try {
+    await prisma.$connect();
+    logger.info("Connected to DB");
+  } catch (err) {
+    logger.error("DB connection failed", err);
+  }
+});
+export default app;
+</file>
+
+<file path="package.json">
+{
+  "name": "workflow-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "worker": "ts-node-dev src/worker.ts",
+    "node-worker": "ts-node-dev src/worker-node.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "prisma": "prisma",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.63.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^167.0.0",
+    "ioredis": "^5.8.2",
+    "jest": "^29.7.0",
+    "jexl": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "lodash.get": "^4.4.2",
+    "nodemailer": "^7.0.10",
+    "pino": "^10.1.0",
+    "prisma": "^6.19.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/jexl": "^2.3.4",
+    "@types/lodash.get": "^4.4.9",
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^7.0.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
+</file>
+
+</files>
