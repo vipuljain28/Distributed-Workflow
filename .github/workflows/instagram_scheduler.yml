@@ -1,0 +1,51 @@
+name: Autonomous Instagram & Meta Cloud Scheduler
+
+on:
+  schedule:
+    # All times in UTC (IST = UTC + 5:30)
+    # Slot 1: DSA Chapter 02 Reel (10:30 AM IST = 05:00 UTC)
+    - cron: '0 5 * * *'
+    # Slot 2: Solution Architecture Chapter 01 Reel (12:00 PM IST = 06:30 UTC)
+    - cron: '30 6 * * *'
+    # Slot 3: DSA Chapter 02 Carousel (02:00 PM IST = 08:30 UTC)
+    - cron: '30 8 * * *'
+    # Slot 4: Solution Architecture Chapter 01 Carousel (03:00 PM IST = 09:30 UTC)
+    - cron: '30 9 * * *'
+    # Slot 5: System Design Episode 001 Reel (06:00 PM IST = 12:30 UTC)
+    - cron: '30 12 * * *'
+    # Slot 6: System Design Episode 001 Carousel (08:00 PM IST = 14:30 UTC)
+    - cron: '30 14 * * *'
+
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Target Slot to dispatch immediately (slot1, slot2, slot3, slot4, slot5, slot6, or auto)'
+        required: true
+        default: 'auto'
+      dry_run:
+        description: 'Dry run without publishing to Meta API'
+        required: false
+        default: 'false'
+
+jobs:
+  dispatch_meta:
+    name: Cloud Instagram Dispatcher
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Cloud Dispatcher
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID || '17841407910414880' }}
+        run: |
+          SLOT_ARG="${{ github.event.inputs.slot || 'auto' }}"
+          DRY_ARG="${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}"
+          echo "🚀 Triggering Instagram Cloud Dispatcher: Slot=$SLOT_ARG $DRY_ARG"
+          python scripts/dispatch_instagram.py --slot "$SLOT_ARG" $DRY_ARG
