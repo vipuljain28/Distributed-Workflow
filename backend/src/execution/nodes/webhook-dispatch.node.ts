@@ -30,7 +30,7 @@ export class WebhookDispatchNode {
       if (!url) {
         return {
           success: false,
-          error: "WebhookDispatchNode: No target webhook URL specified in config or input",
+          errorMessage: "WebhookDispatchNode: No target webhook URL specified in config or input",
         };
       }
 
@@ -75,7 +75,7 @@ export class WebhookDispatchNode {
       console.error("[WebhookDispatch] Error dispatching payload:", err.message);
       return {
         success: false,
-        error: err.response?.data || err.message,
+        errorMessage: err.response?.data?.message || err.message,
       };
     }
   }

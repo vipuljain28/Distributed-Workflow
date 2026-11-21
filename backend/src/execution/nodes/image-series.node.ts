@@ -106,7 +106,7 @@ Output valid JSON array with ${slideCount} items: [{ "slideIndex": number, "type
     } catch (err: any) {
       return {
         success: false,
-        error: err.message,
+        errorMessage: err.message,
       };
     }
   }

@@ -167,7 +167,7 @@ Output valid JSON only with keys: title, durationSec, beats (array of { beat, na
     } catch (err: any) {
       return {
         success: false,
-        error: err.message,
+        errorMessage: err.message,
       };
     }
   }

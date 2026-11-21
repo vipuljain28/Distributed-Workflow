@@ -15,4 +15,5 @@ export interface NodeExecutionResult {
   success: boolean;
   output?: JsonObject | null;
   errorMessage?: string | null;
+  error?: any;
 }
