@@ -5,6 +5,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 import path from "path";
+import os from "os";
 
 const execAsync = promisify(exec);
 
@@ -129,7 +130,7 @@ Output valid JSON only with keys: title, durationSec, beats (array of { beat, na
         }
       }
 
-      // FFmpeg local synthetic render
+      // Production Safe Video & Storyboard Generation
       const outputDir = path.join(process.cwd(), "temp_renders");
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -139,14 +140,17 @@ Output valid JSON only with keys: title, durationSec, beats (array of { beat, na
       const videoPath = path.join(outputDir, videoFilename);
 
       let renderedWithFFmpeg = false;
-      try {
-        await execAsync("ffmpeg -version");
-        const safeTitle = (storyboard.title || concept).replace(/[^a-zA-Z0-9 ]/g, " ");
-        const ffmpegCmd = `ffmpeg -y -f lavfi -i color=c=0x0f172a:s=1080x1920:d=10 -vf "drawtext=text='${safeTitle}':fontcolor=white:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2" -c:v libx264 -pix_fmt yuv420p "${videoPath}"`;
-        await execAsync(ffmpegCmd);
-        renderedWithFFmpeg = true;
-      } catch (ffErr) {
-        // Fallback for environments where ffmpeg CLI isn't installed
+      // Memory check: Prevent container OOM kills on 512MB RAM instances
+      const freeMem = os.freemem();
+      if (freeMem > 250 * 1024 * 1024 && process.env.ENABLE_LOCAL_FFMPEG === "true") {
+        try {
+          // Ultra-lightweight synthetic clip: 540x960, 3s, ultrafast preset, 1 thread
+          const ffmpegCmd = `ffmpeg -y -f lavfi -i color=c=0x0f172a:s=540x960:d=3 -preset ultrafast -threads 1 -c:v libx264 -pix_fmt yuv420p "${videoPath}"`;
+          await execAsync(ffmpegCmd);
+          renderedWithFFmpeg = true;
+        } catch (ffErr: any) {
+          console.info("[ReelRender] Local FFmpeg render fallback to Cloud RenderPlan:", ffErr?.message);
+        }
       }
 
       return {
