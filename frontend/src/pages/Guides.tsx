@@ -1,5 +1,5 @@
 // frontend/src/pages/Guides.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function Guides() {
   const [activeTab, setActiveTab] = useState<"meta" | "youtube" | "ai" | "crons">("meta");

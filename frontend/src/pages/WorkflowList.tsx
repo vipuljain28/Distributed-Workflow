@@ -1,5 +1,5 @@
 // frontend/src/pages/WorkflowList.tsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { WorkflowAPI } from "../api/workflow";
 
 export default function WorkflowList() {
